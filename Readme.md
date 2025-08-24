@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Василий Веркин](https://up.htmlacademy.ru/ecmascript-individual/2/user/2092395).
-* Наставник: `Неизвестно`.
+* Наставник: [Денис Лопатин](https://htmlacademy.ru/profile/denislopatin).
 
 ---
 
