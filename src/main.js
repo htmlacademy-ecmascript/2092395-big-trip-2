@@ -1,15 +1,24 @@
-import { NewPointButtonView } from './view/add-new-point-view.js';
-import { FilterView } from './view/filter-view.js';
-import { InfoTripView } from './view/info-trip-view.js';
-import { render } from './render.js';
-// Найдем main разметки
-// const siteMainElement = document.querySelector('.main');
+import NewPointButtonView from './view/add-new-point-view.js';
+import FilterView from './view/filter-view.js';
+import InfoTripView from './view/info-trip-view.js';
+import SortView from './view/sort-view.js';
+import PointPresenter from './presenter/point-presenter.js'
+import { RenderPosition, render } from './render.js';
+
 
 const siteHeader = document.querySelector('.page-header');
-const siteHeaderMainElement = document.querySelector('.trip-main');
-const siteHeaderElement = siteHeader.querySelector('.trip-filters');
-const siteHeaderFilter = siteHeaderMainElement .querySelector('.trip-controls__filters');
+const siteHeaderMainElement = siteHeader.querySelector('.trip-main');
+const siteHeaderFilters = siteHeader.querySelector('.trip-controls');
 
-render (new InfoTripView(), siteHeaderMainElement);
-// render (new NewPointButtonView(), siteHeaderElement);
-render (new FilterView(), siteHeaderFilter);
+const siteMain = document.querySelector('.page-main');
+const siteMainElement = siteMain.querySelector('.trip-events');
+
+
+render (new InfoTripView(), siteHeaderMainElement, RenderPosition.AFTERBEGIN);
+render (new FilterView(), siteHeaderFilters);
+render (new NewPointButtonView(), siteHeaderMainElement);
+render (new SortView(), siteMainElement);
+
+const pointPresenter = new PointPresenter();
+
+pointPresenter.init(siteMainElement);

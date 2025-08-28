@@ -4,7 +4,7 @@ function createNewPointButtonTemplate() {
   return '<button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button" disabled>New event</button>';
 }
 
-export class NewPointButtonView {
+export default class NewPointButtonView {
   getTemplate() {
     return createNewPointButtonTemplate();
   }

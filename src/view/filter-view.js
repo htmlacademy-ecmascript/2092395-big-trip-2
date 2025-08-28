@@ -23,7 +23,7 @@ function createFilterTemplate() {
             </div>`;
 }
 
-export class FilterView {
+export default class FilterView {
   getTemplate() {
     return createFilterTemplate();
   }
