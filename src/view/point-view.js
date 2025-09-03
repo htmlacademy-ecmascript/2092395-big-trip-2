@@ -1,9 +1,15 @@
 import { createElement } from '../render.js';
+import { humanizePointDate } from '../utils.js';
 
-function createPointTemplate() {
+function createPointTemplate(point) {
+  // Извлекаем из объекта с описанием точки данные тех ключей, где мы сразу можем воспользоваться этими данными
+  const {tripDate} = point;
+  // Преобразовываем дату к нужному виду
+  const date = humanizePointDate(tripDate);
+
   return `<li class="trip-events__item">
             <div class="event">
-              <time class="event__date" datetime="2019-03-18">MAR 18</time>
+              <time class="event__date" datetime="2019-03-18">${date}</time>
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
               </div>
@@ -41,8 +47,14 @@ function createPointTemplate() {
 }
 
 export default class PointView {
+  // Определяем конструктор, где с помощью деструктуризации извлекаем объект с описанием точки
+  constructor({point}) {
+    // Полученные данные точки сохраняем внутри экземпляра в свойство point
+    this.point = point;
+  }
+
   getTemplate() {
-    return createPointTemplate();
+    return createPointTemplate(this.point);
   }
 
   getElement() {

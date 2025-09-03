@@ -3,7 +3,7 @@ import { TYPE_OF_EVENTS } from '../const.js';
 
 const mockPoints = [
   {
-    tripDate: null,
+    tripDate: new Date(),
     event: getRandomArrayElement(TYPE_OF_EVENTS),
     startTime: null,
     endTime: null,
