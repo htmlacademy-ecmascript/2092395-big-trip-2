@@ -3,9 +3,9 @@ import { humanizePointDate } from '../utils.js';
 
 function createPointTemplate(point) {
   // Извлекаем из объекта с описанием точки данные тех ключей, где мы сразу можем воспользоваться этими данными
-  const {tripDate} = point;
+  const {dateFrom} = point;
   // Преобразовываем дату к нужному виду
-  const date = humanizePointDate(tripDate);
+  const date = humanizePointDate(dateFrom);
 
   return `<li class="trip-events__item">
             <div class="event">
