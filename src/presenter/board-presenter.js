@@ -19,8 +19,19 @@ export default class BoardPresenter {
     render(this.boardComponent, this.boardContainer);
     render(new SortView(), this.boardComponent.getElement());
 
+    render(new EditPointView({
+      point: this.boardPoints[0],
+      checkedOffers: [...this.pointsModel.getOffersById(this.boardPoints[0].type, this.boardPoints[0].offers)],
+      offers: this.pointsModel.getOffersByType(this.boardPoints[0].type),
+      destination: this.pointsModel.getDestinationsById(this.boardPoints[0].destination)
+    }), this.boardComponent.getElement());
+
     for (let i = 0; i < this.boardPoints.length; i++) {
-      render(new PointView({point: this.boardPoints[i]}), this.boardComponent.getElement());
+      render(new PointView({
+        point: this.boardPoints[i],
+        offers:[...this.pointsModel.getOffersById(this.boardPoints[i].type, this.boardPoints[i].offers)],
+        destination: this.pointsModel.getDestinationsById(this.boardPoints[i].destination)
+      }), this.boardComponent.getElement());
     }
 
     render(new EditPointView(), this.boardComponent.getElement());

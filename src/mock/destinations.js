@@ -1,7 +1,7 @@
 export const mockDestinations = [
   {
-    id: 'cfe416cq-10xa-ye10-8077-2fs9a01edcab',
-    description: 'Chamonix, is a beautiful city, a true asian pearl, with crowded streets.',
+    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
+    description: 'Cx, is a beautiful city, a true asian pearl, with crowded streets.',
     name: 'Chamonix',
     pictures: [
       {
@@ -11,7 +11,7 @@ export const mockDestinations = [
     ]
   },
   {
-    id: 'cfe416cq-10xa-ye10-8077-2fs9a01edcac',
+    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e05',
     description: 'Amsterdam, is a beautiful city, a true asian pearl, with crowded streets.',
     name: 'Amsterdam',
     pictures: [
@@ -22,7 +22,7 @@ export const mockDestinations = [
     ]
   },
   {
-    id: 'cfe416cq-10xa-ye10-8077-2fs9a01edcad',
+    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e06',
     description: 'Geneva, is a beautiful city, a true asian pearl, with crowded streets.',
     name: 'Geneva',
     pictures: [

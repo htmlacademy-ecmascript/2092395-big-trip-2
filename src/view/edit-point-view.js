@@ -1,6 +1,9 @@
 import { createElement } from '../render.js';
 
-function createEditPointTemplate() {
+function createEditPointTemplate(point, offers, checkedOffers, destinations) {
+  const { type, dateFrom, dateTo, basePrice } = point;
+  const { name } = destinations;
+
   return `<form class="event event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
@@ -158,8 +161,16 @@ function createEditPointTemplate() {
 }
 
 export default class EditPointView {
+  constructor({point, offers, checkedOffers, destinations}) {
+    // Полученные данные точки сохраняем внутри экземпляра в свойство point
+    this.point = point;
+    this.offers = offers;
+    this.checkedOffers = checkedOffers;
+    this.destinations = destinations;
+  }
+
   getTemplate() {
-    return createEditPointTemplate();
+    return createEditPointTemplate(this.point, this.offers, this.checkedOffers, this.destinations);
   }
 
   getElement() {
