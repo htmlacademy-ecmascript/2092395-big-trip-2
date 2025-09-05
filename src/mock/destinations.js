@@ -1,35 +1,196 @@
+import { getRandomInteger, getRandomArrayElement } from '../utils.js';
+import { CITIES, DESCRIPTIONS } from '../const.js';
+
+const createDescriptions = () =>
+  Array.from({ length: getRandomInteger(1, 2) }, () =>
+    getRandomArrayElement(DESCRIPTIONS)
+  ).join(' ');
+
 export const mockDestinations = [
   {
-    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
-    description: 'Cx, is a beautiful city, a true asian pearl, with crowded streets.',
-    name: 'Chamonix',
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808a',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163317',
-        description: 'Chamonix parliament building',
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
       }
     ]
   },
   {
-    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e05',
-    description: 'Amsterdam, is a beautiful city, a true asian pearl, with crowded streets.',
-    name: 'Amsterdam',
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808b',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163317',
-        description: 'Amsterdam parliament building',
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
       }
     ]
   },
   {
-    id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e06',
-    description: 'Geneva, is a beautiful city, a true asian pearl, with crowded streets.',
-    name: 'Geneva',
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808c',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163317',
-        description: 'Geneva parliament building',
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
       }
     ]
   },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808d',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808e',
+    description: '',
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      }
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808f',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      }
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808j',
+    description: '',
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808h',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      }
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808i',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        description: ''
+      }
+    ]
+  },
+  {
+    id: 'f4b62099-293f-4c3d-a702-94eec4a2808j',
+    description: createDescriptions(),
+    name: getRandomArrayElement(CITIES),
+    pictures: [
+    ]
+  }
 ];
+
+export function getRandomDestinations() {
+  return getRandomArrayElement(mockDestinations);
+}

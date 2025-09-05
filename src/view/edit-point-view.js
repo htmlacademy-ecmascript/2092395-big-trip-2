@@ -2,7 +2,7 @@ import { createElement } from '../render.js';
 
 function createEditPointTemplate(point, offers, checkedOffers, destinations) {
   const { type, dateFrom, dateTo, basePrice } = point;
-  const { name } = destinations;
+  // const { name } = destinations;
 
   return `<form class="event event--edit" action="#" method="post">
             <header class="event__header">

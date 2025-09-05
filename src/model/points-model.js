@@ -38,7 +38,7 @@ export default class PointsModel {
   }
 
   getDestinationsById(id) {
-    const allDestinations = this.getDestinations(); // исправлена опечатка
+    const allDestinations = this.getDestinations();
     return allDestinations.find((item) => item.id === id);
   }
 }

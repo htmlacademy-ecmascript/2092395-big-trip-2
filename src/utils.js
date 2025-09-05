@@ -2,12 +2,20 @@ import dayjs from 'dayjs';
 
 const DATE_FORMAT = 'MMMM D';
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
 function humanizePointDate(dateFrom) {
   return dateFrom ? dayjs(dateFrom).format(DATE_FORMAT) : '';
+}
+
+function getRandomInteger(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function getRandomBoolean() {
+  return Math.random() > 0.5;
+}
+
+function getRandomArrayElement(items) {
+  return items[Math.floor(Math.random() * items.length)];
 }
 
 // function getDifferenceInTime(start, end) {
@@ -24,4 +32,9 @@ function humanizePointDate(dateFrom) {
 //   }
 // }
 
-export {getRandomArrayElement, humanizePointDate};
+export {
+  humanizePointDate,
+  getRandomInteger,
+  getRandomBoolean,
+  getRandomArrayElement
+};
