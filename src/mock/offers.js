@@ -112,7 +112,7 @@ const mockOffers = [
         id: 'b4c3e4e6-9053-42ce-b747-e281314baa3r',
         title: 'Rent S-Class car',
         price: 60,
-        isChoosen: getRandomBoolean,
+        isChoosen: getRandomBoolean(),
       }
     ]
   },
