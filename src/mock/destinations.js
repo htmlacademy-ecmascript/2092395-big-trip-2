@@ -191,6 +191,3 @@ export const mockDestinations = [
   }
 ];
 
-export function getRandomDestinations() {
-  return getRandomArrayElement(mockDestinations);
-}

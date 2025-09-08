@@ -14,20 +14,20 @@ function getRandomOffers(offersType) {
     .map((offer) => offer.id);
 }
 
-const getRandomPoint = () => {
+function getRandomPoint() {
   const type = getRandomArrayElement(TYPE_OF_EVENTS);
-  const destination = getRandomArrayElement(mockDestinations);
+  const randomDestination = getRandomArrayElement(mockDestinations);
 
   return {
     id: '',
     basePrice: getRandomInteger(MAX_PRICE),
     dateFrom: new Date('2019-03-18T10:30:56.845Z'),
     dateTo: new Date('2019-03-18T10:30:56.845Z'),
-    destination: destination.id,
+    destination: randomDestination.id,
     isFavorite: getRandomBoolean(),
-    offers: getRandomOffers(mockOffers.find((o) => o.type === type)),
+    offers: getRandomOffers(mockOffers.find((offer) => offer.type === type)),
     type: type,
   };
-};
+}
 
 export { getRandomPoint };

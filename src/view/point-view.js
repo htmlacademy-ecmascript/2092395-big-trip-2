@@ -14,11 +14,9 @@ function createOfferTemplate({title, price}) {
 function createPointTemplate(point, offers, destination) {
   // Извлекаем из объекта с описанием точки данные тех ключей, где мы сразу можем воспользоваться этими данными
   const { type, dateFrom, dateTo, isFavorite, basePrice } = point;
-  // const { name } = destinations;
+  const { name } = destination;
 
-  // Защита от undefined
-  const safeDestinations = destination || {};
-  const name = safeDestinations.name || 'Unknown Destination';
+
   // Преобразовываем дату к нужному виду
   const date = humanizePointDate(dateFrom);
 
@@ -59,15 +57,15 @@ function createPointTemplate(point, offers, destination) {
 
 export default class PointView {
   // Определяем конструктор, где с помощью деструктуризации извлекаем объект с описанием точки
-  constructor({point, offers, destinations}) {
+  constructor({point, offers, destination}) {
     // Полученные данные точки сохраняем внутри экземпляра в свойство point
     this.point = point;
     this.offers = offers;
-    this.destinations = destinations;
+    this.destination = destination;
   }
 
   getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destinations);
+    return createPointTemplate(this.point, this.offers, this.destination);
   }
 
   getElement() {
