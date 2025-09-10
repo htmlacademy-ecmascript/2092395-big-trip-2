@@ -2,7 +2,7 @@ import { getRandomInteger, getRandomArrayElement } from '../utils.js';
 import { CITIES, DESCRIPTIONS } from '../const.js';
 
 const createDescriptions = () =>
-  Array.from({ length: getRandomInteger(1, 2) }, () =>
+  Array.from({ length: getRandomInteger(1, 3) }, () =>
     getRandomArrayElement(DESCRIPTIONS)
   ).join(' ');
 
@@ -13,20 +13,20 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -36,20 +36,20 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -59,20 +59,20 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -85,24 +85,24 @@ export const mockDestinations = [
   },
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808e',
-    description: '',
+    description: 'Chamonix parliament building',
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -112,26 +112,26 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
   {
     id: 'f4b62099-293f-4c3d-a702-94eec4a2808j',
-    description: '',
+    description: 'Chamonix parliament building',
     name: getRandomArrayElement(CITIES),
     pictures: [
     ]
@@ -142,20 +142,20 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -165,20 +165,20 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
+      },
+      {
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
         description: ''
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       },
       {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
-      },
-      {
-        src: `https://loremflickr.com/248/152?random=${getRandomInteger(100)}`,
-        description: ''
+        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -190,4 +190,3 @@ export const mockDestinations = [
     ]
   }
 ];
-

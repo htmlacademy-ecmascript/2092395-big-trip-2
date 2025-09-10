@@ -6,8 +6,8 @@ function humanizePointDate(dateFrom) {
   return dateFrom ? dayjs(dateFrom).format(DATE_FORMAT) : '';
 }
 
-function getRandomInteger(max) {
-  return Math.floor(Math.random() * max);
+function getRandomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function getRandomBoolean() {

@@ -18,7 +18,7 @@ function createOfferTemplate(offer, checkedOffers) {
 
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${id}" ${isChecked}>
+      <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="event-offer" ${isChecked}>
       <label class="event__offer-label" for="${id}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
@@ -28,13 +28,13 @@ function createOfferTemplate(offer, checkedOffers) {
   );
 }
 
-function createOffersListTemplate({offers}, checkedOffers) {
-  if (offers.length !==0) {
+function createOffersListTemplate(offers, checkedOffers) {
+  if (offers && offers.offers && offers.offers.length !== 0) {
     return (
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${offers.map((offer) => createOfferTemplate(offer, checkedOffers).join(''))}
+        ${offers.offers.map((offer) => createOfferTemplate(offer, checkedOffers)).join('')}
         </div>
       </section>`
     );
@@ -44,15 +44,15 @@ function createOffersListTemplate({offers}, checkedOffers) {
 
 function createPhotoTemplate(photo) {
   const {src, description} = photo;
-  return (`<img class ="event__photo" src="${src}" att="${description}"`);
+  return `<img class="event__photo" src="${src}" alt="${description}">`;
 }
 
 function createPhotoContainerTemplate(pictures) {
-  if (pictures.length > 0) {
+  if (pictures && pictures.length > 0) {
     return (
       `<div class="event__photos-container">
         <div class="event__photos-tape">
-        ${pictures.map((item) => createPhotoTemplate((item)).join(''))}
+        ${pictures.map((item) => createPhotoTemplate(item)).join('')}
         </div>
       </div>`
     );
@@ -61,30 +61,25 @@ function createPhotoContainerTemplate(pictures) {
 }
 
 function createDestinationTemplate(destination) {
-  const {destination, pictures} = destination;
-
-  if (destination > 0 || pictures.length > 0) {
+  if (destination && (destination.description || (destination.pictures && destination.pictures.length > 0))) {
     return (
       `<section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">${destination}</h3>
-        <p class="event__destination-description">${description}</p>
-
-        ${createPhotoContainerTemplate(pictures)}
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${destination.description || ''}</p>
+        ${createPhotoContainerTemplate(destination.pictures || [])}
       </section>`
     );
   }
   return '';
 }
 
-function createDestinationList({name}) {
-  return (
-    `<option value="${name}"></option>`
-  );
+function createDestinationList(destination) {
+  return `<option value="${destination.name}"></option>`;
 }
 
 function createEditPointTemplate(point, offers, checkedOffers, destination) {
-  const { type, dateFrom, dateTo, isFavorite, basePrice } = point;
-  const { name } = destination;
+  const { type, dateFrom, dateTo, basePrice } = point;
+  const destinationName = destination ? destination.name : '';
 
   return (
     `<li class="trip-events__item">
@@ -109,9 +104,9 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
             <datalist id="destination-list-1">
-            ${mockDestinations.map((names) => createDestinationList(names)).join('')}
+              ${mockDestinations.map((dest) => createDestinationList(dest)).join('')}
             </datalist>
           </div>
 
@@ -128,7 +123,7 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -138,6 +133,8 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
           </button>
         </header>
         <section class="event__details">
+          ${createOffersListTemplate(offers, checkedOffers)}
+          ${createDestinationTemplate(destination)}
         </section>
       </form>
     </li>`
@@ -145,16 +142,15 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
 }
 
 export default class EditPointView {
-  constructor({point, offers, checkedOffers, destinations}) {
-    // Полученные данные точки сохраняем внутри экземпляра в свойство point
+  constructor({point, offers, checkedOffers, destination}) {
     this.point = point;
     this.offers = offers;
     this.checkedOffers = checkedOffers;
-    this.destinations = destinations;
+    this.destination = destination;
   }
 
   getTemplate() {
-    return createEditPointTemplate(this.point, this.offers, this.checkedOffers, this.destinations);
+    return createEditPointTemplate(this.point, this.offers, this.checkedOffers, this.destination);
   }
 
   getElement() {

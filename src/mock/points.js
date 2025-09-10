@@ -3,6 +3,7 @@ import { mockDestinations } from './destinations.js';
 import { TYPE_OF_EVENTS } from '../const.js';
 import { mockOffers } from '../mock/offers.js';
 
+const MIN_PRICE = 1;
 const MAX_PRICE = 1000;
 
 function getRandomOffers(offersType) {
@@ -20,7 +21,7 @@ function getRandomPoint() {
 
   return {
     id: '',
-    basePrice: getRandomInteger(MAX_PRICE),
+    basePrice: getRandomInteger(MIN_PRICE, MAX_PRICE),
     dateFrom: new Date('2019-03-18T10:30:56.845Z'),
     dateTo: new Date('2019-03-18T10:30:56.845Z'),
     destination: randomDestination.id,
