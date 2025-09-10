@@ -1,10 +1,11 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+// Расширяем dayjs плагином duration
+dayjs.extend(duration);
 
 const DATE_FORMAT = 'MMMM D';
-
-function humanizePointDate(dateFrom) {
-  return dateFrom ? dayjs(dateFrom).format(DATE_FORMAT) : '';
-}
+const TIME_FORMAT = 'HH:mm';
 
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -18,23 +19,32 @@ function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-// function getDifferenceInTime(start, end) {
-//   const difference = dayjs(end).diff(start) / MILLISECONDS_IN_MINUTES;
+function humanizePointDate(date) {
+  return date ? dayjs(date).format(DATE_FORMAT) : '';
+}
 
-//   switch (difference) {
-//     case difference < SECONDS_IN_MINUTES:
-//       return dayjs(difference).format('mm[M]');
+function humanizePointTime(date) {
+  return date ? dayjs(date).format(TIME_FORMAT) : '';
+}
 
-//     case difference > SECONDS_IN_MINUTES && difference < SECONDS_IN_MINUTES * HOURS_IN_DAY:
-//       return dayjs(difference).format('HH[H] mm[M]');
-//     default:
-//       return dayjs(difference).format('DD[D] HH[H] mm[M]');
-//   }
-// }
+function getDifferenceInTime(dateStart, dateEnd) {
+  const duration = dayjs.duration(dayjs(dateEnd).diff(dateStart));
+  const days = duration.days();
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+
+  return days > 0
+    ? `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`
+    : hours > 0
+      ? `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`
+      : `${minutes}M`;
+}
 
 export {
-  humanizePointDate,
   getRandomInteger,
   getRandomBoolean,
-  getRandomArrayElement
+  getRandomArrayElement,
+  humanizePointDate,
+  humanizePointTime,
+  getDifferenceInTime,
 };

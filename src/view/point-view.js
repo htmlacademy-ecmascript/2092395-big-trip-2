@@ -1,5 +1,5 @@
 import { createElement } from '../render.js';
-import { humanizePointDate } from '../utils.js';
+import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils.js';
 
 function createOfferTemplate({title, price}) {
   return (
@@ -16,24 +16,20 @@ function createPointTemplate(point, offers, destination) {
   const { type, dateFrom, dateTo, isFavorite, basePrice } = point;
   const { name } = destination;
 
-
-  // Преобразовываем дату к нужному виду
-  const date = humanizePointDate(dateFrom);
-
   return `<li class="trip-events__item">
             <div class="event">
-              <time class="event__date" datetime=${dateFrom}>${date}</time>
+              <time class="event__date" datetime=${dateFrom}>${humanizePointDate(dateFrom)}</time>
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
               </div>
               <h3 class="event__title">${type} ${name}</h3>
               <div class="event__schedule">
                 <p class="event__time">
-                  <time class="event__start-time" datetime=${dateFrom}>10:30</time>
+                  <time class="event__start-time" datetime=${dateFrom}>${humanizePointTime(dateFrom)}</time>
                   &mdash;
-                  <time class="event__end-time" datetime=${dateTo}>11:00</time>
+                  <time class="event__end-time" datetime=${dateTo}>${humanizePointTime(dateTo)}</time>
                 </p>
-                <p class="event__duration">30M</p>
+                <p class="event__duration">${getDifferenceInTime(dateFrom, dateTo)}</p>
               </div>
               <p class="event__price">
                 &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
