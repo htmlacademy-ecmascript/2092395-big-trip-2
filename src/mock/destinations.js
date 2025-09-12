@@ -1,5 +1,6 @@
 import { getRandomInteger, getRandomArrayElement } from '../utils.js';
 import { CITIES, DESCRIPTIONS } from '../const.js';
+import { MIN_PHOTO_INDEX, MAX_PHOTO_INDEX } from '../const.js';
 
 const createDescriptions = () =>
   Array.from({ length: getRandomInteger(1, 3) }, () =>
@@ -13,19 +14,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -36,19 +37,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -59,19 +60,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -89,19 +90,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -112,19 +113,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -142,19 +143,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]
@@ -165,19 +166,19 @@ export const mockDestinations = [
     name: getRandomArrayElement(CITIES),
     pictures: [
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: ''
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       },
       {
-        src: `img/photos/${getRandomInteger(1, 5)}.jpg`,
+        src: `img/photos/${getRandomInteger(MIN_PHOTO_INDEX, MAX_PHOTO_INDEX)}.jpg`,
         description: 'Chamonix parliament building'
       }
     ]

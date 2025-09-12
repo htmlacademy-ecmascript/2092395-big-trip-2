@@ -1,10 +1,7 @@
 import { getRandomArrayElement, getRandomInteger, getRandomBoolean } from '../utils.js';
 import { mockDestinations } from './destinations.js';
-import { TYPE_OF_EVENTS } from '../const.js';
+import { TYPE_OF_EVENTS, MIN_PRICE, MAX_PRICE } from '../const.js';
 import { mockOffers } from '../mock/offers.js';
-
-const MIN_PRICE = 1;
-const MAX_PRICE = 1000;
 
 function getRandomOffers(offersType) {
   if (!offersType || !offersType.offers) {

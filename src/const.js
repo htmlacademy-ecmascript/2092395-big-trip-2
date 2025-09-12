@@ -28,5 +28,18 @@ const DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.'];
 
+const MIN_PRICE = 1;
+const MAX_PRICE = 1000;
 
-export {TYPE_OF_EVENTS, CITIES, DESCRIPTIONS};
+const MIN_PHOTO_INDEX = 1;
+const MAX_PHOTO_INDEX = 5;
+
+export {
+  TYPE_OF_EVENTS,
+  CITIES,
+  DESCRIPTIONS,
+  MIN_PRICE,
+  MAX_PRICE,
+  MIN_PHOTO_INDEX,
+  MAX_PHOTO_INDEX
+};

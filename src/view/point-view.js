@@ -14,7 +14,7 @@ function createOfferTemplate({title, price}) {
 function createPointTemplate(point, offers, destination) {
   // Извлекаем из объекта с описанием точки данные тех ключей, где мы сразу можем воспользоваться этими данными
   const { type, dateFrom, dateTo, isFavorite, basePrice } = point;
-  const { name } = destination;
+  const { name } = destination || {};
 
   return `<li class="trip-events__item">
             <div class="event">
