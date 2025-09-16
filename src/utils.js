@@ -1,11 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { DATE_FORMAT, TIME_FORMAT, } from './const.js';
 
 // Расширяем dayjs плагином duration
 dayjs.extend(duration);
-
-const DATE_FORMAT = 'MMMM D';
-const TIME_FORMAT = 'HH:mm';
 
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
