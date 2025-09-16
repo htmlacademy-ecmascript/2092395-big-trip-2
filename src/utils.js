@@ -33,11 +33,14 @@ function getDifferenceInTime(dateStart, dateEnd) {
   const hours = duration.hours();
   const minutes = duration.minutes();
 
-  return days > 0
-    ? `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`
-    : hours > 0
-      ? `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`
-      : `${minutes}M`;
+  switch (true) {
+    case days > 0:
+      return `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+    case hours > 0:
+      return `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+    default:
+      return `${minutes}M`;
+  }
 }
 
 export {
