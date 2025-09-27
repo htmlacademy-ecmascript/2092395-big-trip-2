@@ -1,9 +1,10 @@
 // import NewPointButtonView from './view/add-new-point-view.js';
+import { render } from './framework/render.js';
 import FilterView from './view/filter-view.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import PointsModel from './model/points-model.js';
 import TripInfoPresenter from './presenter/trip-info-presenter.js';
-import { render } from './render.js';
+
 
 const siteHeader = document.querySelector('.page-header');
 const siteHeaderMainElement = siteHeader.querySelector('.trip-main');

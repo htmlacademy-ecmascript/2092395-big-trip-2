@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { TYPE_OF_EVENTS } from '../const.js';
 import { humanizePointDate } from '../utils.js';
@@ -141,27 +141,23 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
   );
 }
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #checkedOffers = null;
+  #destination = null;
+
   constructor({point, offers, checkedOffers, destination}) {
-    this.point = point;
-    this.offers = offers;
-    this.checkedOffers = checkedOffers;
-    this.destination = destination;
+    // Вызываем родительский конструктор, т.к. наследуемся от AbstractView
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#checkedOffers = checkedOffers;
+    this.#destination = destination;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.offers, this.checkedOffers, this.destination);
+  get template() {
+    return createEditPointTemplate(this.#point, this.#offers, this.#checkedOffers, this.#destination);
   }
 
-  getElement() {
-    if(!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }

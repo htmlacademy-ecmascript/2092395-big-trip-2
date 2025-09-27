@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils.js';
 
 function createOfferTemplate({title, price}) {
@@ -51,28 +51,22 @@ function createPointTemplate(point, offers, destination) {
           </li>`;
 }
 
-export default class PointView {
+export default class PointView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offers = null;
   // Определяем конструктор, где с помощью деструктуризации извлекаем объект с описанием точки
   constructor({point, offers, destination}) {
+    // Вызываем родительский конструктор, т.к. наследуемся от AbstractView
+    super();
     // Полученные данные точки сохраняем внутри экземпляра в свойство point
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if(!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }

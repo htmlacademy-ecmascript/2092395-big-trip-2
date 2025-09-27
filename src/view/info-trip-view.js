@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createInfoTripTemplate({title, dateRange, totalCost}) {
   return `<section class="trip-main__trip-info  trip-info">
@@ -14,29 +14,24 @@ function createInfoTripTemplate({title, dateRange, totalCost}) {
           </section>`;
 }
 
-export default class InfoTripView {
+export default class InfoTripView extends AbstractView {
+  #title = null;
+  #dateRange = null;
+  #totalCost = null;
   constructor({title, dateRange, totalCost}) {
-    this.title = title;
-    this.dateRange = dateRange;
-    this.totalCost = totalCost;
+    // Вызываем родительский конструктор, т.к. наследуемся от AbstractView
+    super();
+    this.#title = title;
+    this.#dateRange = dateRange;
+    this.#totalCost = totalCost;
   }
 
-  getTemplate() {
+  get template() {
     return createInfoTripTemplate({
-      title: this.title,
-      dateRange: this.dateRange,
-      totalCost: this.totalCost
+      title: this.#title,
+      dateRange: this.#dateRange,
+      totalCost: this.#totalCost
     });
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
