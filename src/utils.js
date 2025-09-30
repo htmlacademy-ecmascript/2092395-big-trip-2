@@ -26,10 +26,10 @@ function humanizePointTime(date) {
 }
 
 function getDifferenceInTime(dateStart, dateEnd) {
-  const duration = dayjs.duration(dayjs(dateEnd).diff(dateStart));
-  const days = duration.days();
-  const hours = duration.hours();
-  const minutes = duration.minutes();
+  const timeDuration = dayjs.duration(dayjs(dateEnd).diff(dateStart));
+  const days = timeDuration.days();
+  const hours = timeDuration.hours();
+  const minutes = timeDuration.minutes();
 
   switch (true) {
     case days > 0:
