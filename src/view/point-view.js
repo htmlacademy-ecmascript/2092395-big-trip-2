@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils.js';
 
-function createOfferTemplate({title, price}) {
+function createOfferTemplate({ title, price }) {
   return (
     `<li class="event__offer">
       <span class="event__offer-title">${title}</span>
@@ -12,7 +12,6 @@ function createOfferTemplate({title, price}) {
 }
 
 function createPointTemplate(point, offers, destination) {
-  // Извлекаем из объекта с описанием точки данные тех ключей, где мы сразу можем воспользоваться этими данными
   const { type, dateFrom, dateTo, isFavorite, basePrice } = point;
   const { name } = destination || {};
 
@@ -36,7 +35,7 @@ function createPointTemplate(point, offers, destination) {
               </p>
               <h4 class="visually-hidden">Offers:</h4>
               <ul class="event__selected-offers">
-              ${offers.map((offer) => createOfferTemplate(offer)).join('')}
+                ${offers.map((offer) => createOfferTemplate(offer)).join('')}
               </ul>
               <button class="event__favorite-btn ${isFavorite && 'event__favorite-btn--active'}" type="button">
                 <span class="visually-hidden">Add to favorite</span>
@@ -55,18 +54,26 @@ export default class PointView extends AbstractView {
   #point = null;
   #destination = null;
   #offers = null;
-  // Определяем конструктор, где с помощью деструктуризации извлекаем объект с описанием точки
-  constructor({point, offers, destination}) {
-    // Вызываем родительский конструктор, т.к. наследуемся от AbstractView
+  #handleEditClick = null;
+
+  constructor({ point, offers, destination, onEditClick }) {
     super();
-    // Полученные данные точки сохраняем внутри экземпляра в свойство point
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
+    this.#handleEditClick = onEditClick;
+
+    // Вешаем обработчик на кнопку редактирования
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 
   get template() {
     return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
-
 }
