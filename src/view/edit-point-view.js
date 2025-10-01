@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { TYPE_OF_EVENTS } from '../const.js';
 import { humanizePointDate } from '../utils.js';
@@ -13,7 +13,7 @@ function createTypeTemplate(type) {
 }
 
 function createOfferTemplate(offer, checkedOffers) {
-  const {id, title, price} = offer;
+  const { id, title, price } = offer;
   const isChecked = checkedOffers.map((item) => item.id).includes(id) ? 'checked' : '';
 
   return (
@@ -34,7 +34,7 @@ function createOffersListTemplate(offers, checkedOffers) {
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${offers.offers.map((offer) => createOfferTemplate(offer, checkedOffers)).join('')}
+          ${offers.offers.map((offer) => createOfferTemplate(offer, checkedOffers)).join('')}
         </div>
       </section>`
     );
@@ -43,7 +43,7 @@ function createOffersListTemplate(offers, checkedOffers) {
 }
 
 function createPhotoTemplate(photo) {
-  const {src, description} = photo;
+  const { src, description } = photo;
   return `<img class="event__photo" src="${src}" alt="${description}">`;
 }
 
@@ -52,7 +52,7 @@ function createPhotoContainerTemplate(pictures) {
     return (
       `<div class="event__photos-container">
         <div class="event__photos-tape">
-        ${pictures.map((item) => createPhotoTemplate(item)).join('')}
+          ${pictures.map((item) => createPhotoTemplate(item)).join('')}
         </div>
       </div>`
     );
@@ -141,27 +141,43 @@ function createEditPointTemplate(point, offers, checkedOffers, destination) {
   );
 }
 
-export default class EditPointView {
-  constructor({point, offers, checkedOffers, destination}) {
-    this.point = point;
-    this.offers = offers;
-    this.checkedOffers = checkedOffers;
-    this.destination = destination;
+export default class EditPointView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #checkedOffers = null;
+  #destination = null;
+  #handleFormSubmit = null;
+  #handleCloseClick = null;
+
+  constructor({ point, offers, checkedOffers, destination, onFormSubmit, onCloseClick }) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#checkedOffers = checkedOffers;
+    this.#destination = destination;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleCloseClick = onCloseClick;
+
+    // Обработчик отправки формы
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+
+    // Обработчик кнопки закрытия (стрелка вверх)
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#closeClickHandler);
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.offers, this.checkedOffers, this.destination);
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 
-  getElement() {
-    if(!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseClick();
+  };
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEditPointTemplate(this.#point, this.#offers, this.#checkedOffers, this.#destination);
   }
 }

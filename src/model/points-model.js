@@ -11,22 +11,22 @@ export default class PointsModel {
   // У конструктора массивов Array вызываем метод from, который позволяет из масиво-подобного объекта получить нормальный массив
   // Вторым аргументом передаем функцию, которая будет применена к каждому элементу массива
   // Получаем массив из 3х элементов
-  points = Array.from({length: POINT_COUNT}, getRandomPoint);
-  offers = mockOffers;
-  destinations = mockDestinations;
+  #points = Array.from({length: POINT_COUNT}, getRandomPoint);
+  #offers = mockOffers;
+  #destinations = mockDestinations;
 
   /* Методы для работы  точками */
 
-  getPoints() {
-    return this.points;
+  get points() {
+    return this.#points;
   }
 
-  getOffers() {
-    return this.offers;
+  get offers() {
+    return this.#offers;
   }
 
   getOffersByType(type) {
-    const allOffers = this.getOffers();
+    const allOffers = this.#offers;
     return allOffers.find((offer) => offer.type === type);
   }
 
@@ -38,19 +38,19 @@ export default class PointsModel {
     return offersType.offers.filter((item) => itemsId.includes(item.id));
   }
 
-  getDestinations() {
-    return this.destinations;
+  get destinations() {
+    return this.#destinations;
   }
 
   getDestinationsById(id) {
-    const allDestinations = this.getDestinations();
+    const allDestinations = this.#destinations;
     return allDestinations.find((item) => item.id === id) ?? null;
   }
 
   /* Методы для вычисления данных хедера */
 
   getTripTitle() {
-    const points = this.getPoints();
+    const points = this.#points;
     if (points.length === 0) {
       return 'No points added yet';
     }
@@ -70,7 +70,7 @@ export default class PointsModel {
   }
 
   getTripDateRange() {
-    const points = this.getPoints();
+    const points = this.points;
     if (points.length === 0) {
       return '';
     }
@@ -84,7 +84,7 @@ export default class PointsModel {
   }
 
   getTotalCost() {
-    const points = this.getPoints();
+    const points = this.points;
     // Логика вычисления общей стоимости: сумма цен точек + сумма выбранных офферов
     return points.reduce((total, point) => {
       const pointCost = point.basePrice;

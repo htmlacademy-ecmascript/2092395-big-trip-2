@@ -1,39 +1,95 @@
+import { render, replace } from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
-import {render} from '../render.js';
 
 export default class BoardPresenter {
-  boardComponent = new EventListView();
+  #boardContainer = null;
+  #pointsModel = null;
+  #boardComponent = new EventListView();
+  #boardPoints = [];
 
-  constructor({boardContainer, pointsModel}) {
-    this.boardContainer = boardContainer;
-    this.pointsModel = pointsModel;
+  constructor({ boardContainer, pointsModel }) {
+    this.#boardContainer = boardContainer;
+    this.#pointsModel = pointsModel;
   }
 
   init() {
-    this.boardPoints = [...this.pointsModel.getPoints()];
+    // 1. Получаем данные из модели
+    this.#boardPoints = [...this.#pointsModel.points];
 
-    render(this.boardComponent, this.boardContainer);
-    render(new SortView(), this.boardComponent.getElement());
+    // 2. Запускаем рендеринг доски
+    this.#renderBoard();
+  }
 
-    const firstPoint = this.boardPoints[0];
+  #renderPoint(point) {
+    // 3. Получаем дополнительные данные для точки
+    const offers = [...this.#pointsModel.getOffersById(point.type, point.offers)];
+    const destination = this.#pointsModel.getDestinationsById(point.destination);
+    const allOffers = this.#pointsModel.getOffersByType(point.type);
 
-    render(new EditPointView({
-      point: firstPoint,
-      checkedOffers: [...this.pointsModel.getOffersById(firstPoint.type, this.boardPoints[0].offers)],
-      offers: this.pointsModel.getOffersByType(firstPoint.type),
-      destination: this.pointsModel.getDestinationsById(firstPoint.destination)
-    }), this.boardComponent.getElement());
+    // 4. Создаем обработчик Escape
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceFormToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
 
-    for (let i = 0; i < this.boardPoints.length; i++) {
-      const point = this.boardPoints[i];
-      render(new PointView({
-        point: this.boardPoints[i],
-        offers:[...this.pointsModel.getOffersById(point.type, point.offers)],
-        destination: this.pointsModel.getDestinationsById(point.destination)
-      }), this.boardComponent.getElement());
+    // 5. Создаем компонент точки маршрута
+    const pointComponent = new PointView({
+      point: point,
+      offers: offers,
+      destination: destination,
+      onEditClick: () => {
+        replacePointToForm();
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
+    });
+
+    // 6. Создаем компонент формы редактирования
+    const editPointComponent = new EditPointView({
+      point: point,
+      offers: allOffers,
+      checkedOffers: offers,
+      destination: destination,
+      onFormSubmit: () => {
+        closeEditForm();
+      },
+      onCloseClick: () => {
+        closeEditForm();
+      }
+    });
+
+    // 7. Функции для замены компонентов
+    function replacePointToForm () {
+      replace(editPointComponent, pointComponent);
+    }
+
+    function replaceFormToPoint () {
+      replace(pointComponent, editPointComponent);
+    }
+
+    function closeEditForm () {
+      replaceFormToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+
+    // 8. Изначально рендерим точку маршрута
+    render(pointComponent, this.#boardComponent.element);
+  }
+
+  #renderBoard() {
+    // 9. Рендерим контейнер для точек
+    render(this.#boardComponent, this.#boardContainer);
+    // 10. Рендерим сортировку
+    render(new SortView(), this.#boardComponent.element);
+
+    // 11. Рендерим все точки маршрута
+    for (let i = 0; i < this.#boardPoints.length; i++) {
+      this.#renderPoint(this.#boardPoints[i]);
     }
   }
 }
