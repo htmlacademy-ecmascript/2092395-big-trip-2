@@ -2,8 +2,7 @@ import { getRandomPoint } from '../mock/points.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { mockOffers } from '../mock/offers.js';
 import { humanizePointDate } from '../utils.js';
-
-const POINT_COUNT = 3;
+import { POINT_COUNT } from '../const.js';
 
 // Создаем заготовку для модели
 export default class PointsModel {
