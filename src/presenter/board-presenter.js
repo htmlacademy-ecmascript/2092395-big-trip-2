@@ -3,6 +3,7 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
+import NoPointView from '../view/no-point-view.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -88,6 +89,11 @@ export default class BoardPresenter {
     render(new SortView(), this.#boardComponent.element);
 
     // 11. Рендерим все точки маршрута
+    if (this.#boardPoints.length === 0) {
+      render(new NoPointView(), this.#boardContainer);
+      return;
+    }
+
     for (let i = 0; i < this.#boardPoints.length; i++) {
       this.#renderPoint(this.#boardPoints[i]);
     }

@@ -19,8 +19,8 @@ function getRandomPoint() {
   return {
     id: '',
     basePrice: getRandomInteger(MIN_PRICE, MAX_PRICE),
-    dateFrom: new Date('2019-03-18T10:30:00'),
-    dateTo: new Date('2019-03-18T11:00:00'),
+    dateFrom: new Date('2018-03-18T10:30:00'),
+    dateTo: new Date('2018-04-18T11:00:00'),
     destination: randomDestination.id,
     isFavorite: getRandomBoolean(),
     offers: getRandomOffers(mockOffers.find((offer) => offer.type === type)),

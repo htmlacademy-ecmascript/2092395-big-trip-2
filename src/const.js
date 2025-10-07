@@ -28,6 +28,15 @@ const DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.'];
 
+  const FILTERS = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
+
+const POINT_COUNT = 4;
+
 const MIN_PRICE = 1;
 const MAX_PRICE = 1000;
 
@@ -47,4 +56,6 @@ export {
   MAX_PHOTO_INDEX,
   DATE_FORMAT,
   TIME_FORMAT,
+  POINT_COUNT,
+  FILTERS,
 };

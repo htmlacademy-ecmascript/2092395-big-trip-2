@@ -54,7 +54,7 @@ const mockOffers = [
         id: 'b4c3e4e6-9053-42ce-b747-e281314baa3j',
         title: 'A separate compartment',
         price: 30,
-        isChoosen: getRandomBoolean(),
+        isChosen: getRandomBoolean(),
       },
       {
         id: 'b4c3e4e6-9053-42ce-b747-e281314baa3h',
