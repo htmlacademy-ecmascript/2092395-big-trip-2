@@ -1,21 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DATE_FORMAT, TIME_FORMAT, } from './const.js';
+import { DATE_FORMAT, TIME_FORMAT, } from '../const.js';
 
 // Расширяем dayjs плагином duration
 dayjs.extend(duration);
-
-function getRandomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomBoolean() {
-  return Math.random() > 0.5;
-}
-
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
 
 function humanizePointDate(date) {
   return date ? dayjs(date).format(DATE_FORMAT) : '';
@@ -42,9 +30,6 @@ function getDifferenceInTime(dateStart, dateEnd) {
 }
 
 export {
-  getRandomInteger,
-  getRandomBoolean,
-  getRandomArrayElement,
   humanizePointDate,
   humanizePointTime,
   getDifferenceInTime,

@@ -1,4 +1,4 @@
-import { getRandomArrayElement, getRandomInteger, getRandomBoolean } from '../utils.js';
+import { getRandomArrayElement, getRandomInteger, getRandomBoolean } from '../utils/common.js';
 import { mockDestinations } from './destinations.js';
 import { TYPE_OF_EVENTS, MIN_PRICE, MAX_PRICE } from '../const.js';
 import { mockOffers } from '../mock/offers.js';
