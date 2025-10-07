@@ -1,7 +1,7 @@
 import { getRandomPoint } from '../mock/points.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { mockOffers } from '../mock/offers.js';
-import { humanizePointDate } from '../utils.js';
+import { humanizePointDate } from '../utils/point.js';
 import { POINT_COUNT } from '../const.js';
 import { generateFilter } from '../mock/filter.js';
 

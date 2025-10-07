@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { TYPE_OF_EVENTS } from '../const.js';
-import { humanizePointDate } from '../utils.js';
+import { humanizePointDate } from '../utils/point.js';
 
 function createTypeTemplate(type) {
   return (

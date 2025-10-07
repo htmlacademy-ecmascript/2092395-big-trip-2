@@ -1,6 +1,5 @@
-import { getRandomInteger, getRandomArrayElement } from '../utils.js';
-import { CITIES, DESCRIPTIONS } from '../const.js';
-import { MIN_PHOTO_INDEX, MAX_PHOTO_INDEX } from '../const.js';
+import { getRandomInteger, getRandomArrayElement } from '../utils/common.js';
+import { CITIES, DESCRIPTIONS, MIN_PHOTO_INDEX, MAX_PHOTO_INDEX } from '../const.js';
 
 const createDescriptions = () =>
   Array.from({ length: getRandomInteger(1, 3) }, () =>
