@@ -1,4 +1,4 @@
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 
@@ -11,44 +11,75 @@ export default class PointPresenter {
   #pointComponent = null;
   #editPointComponent = null;
   #container = null;
+  #onDataChange = null;
 
-  constructor({ point, offers, destination, allOffers, pointsModel, container }) {
+  constructor({ point, offers, destination, allOffers, pointsModel, container, onDataChange }) {
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
     this.#allOffers = allOffers;
     this.#pointsModel = pointsModel;
     this.#container = container;
+    this.#onDataChange = onDataChange;
   }
 
-  init() {
-    this.#renderPoint();
-  }
+  init(point = this.#point) {
+    this.#point = point;
 
-  #renderPoint() {
-    // Создаем компонент точки маршрута
+    // Получаем актуальные данные для точки
+    this.#offers = [...this.#pointsModel.getOffersById(this.#point.type, this.#point.offers)];
+    this.#destination = this.#pointsModel.getDestinationsById(this.#point.destination);
+
+    const prevPointComponent = this.#pointComponent;
+    const prevEditPointComponent = this.#editPointComponent;
+
+    // Создаем новые компоненты
     this.#pointComponent = new PointView({
       point: this.#point,
       offers: this.#offers,
       destination: this.#destination,
       onEditClick: this.#handleEditClick,
+      onFavoriteClick: this.#handleFavoriteClick
     });
 
-    // Создаем компонент формы редактирования
     this.#editPointComponent = new EditPointView({
       point: this.#point,
       offers: this.#allOffers,
       checkedOffers: this.#offers,
       destination: this.#destination,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#handleCloseClick,
+      onCloseClick: this.#handleCloseClick
     });
 
-    // Рендерим точку маршрута
-    render(this.#pointComponent, this.#container);
+    // Если компоненты уже существуют - заменяем их
+    if (prevPointComponent === null && prevEditPointComponent === null) {
+      // Первоначальный рендеринг
+      render(this.#pointComponent, this.#container);
+      return;
+    }
+
+    // Заменяем компоненты, если они отрендерены
+    if (prevPointComponent && this.#container.contains(prevPointComponent.element)) {
+      replace(this.#pointComponent, prevPointComponent);
+    }
+
+    if (prevEditPointComponent && this.#container.contains(prevEditPointComponent.element)) {
+      replace(this.#editPointComponent, prevEditPointComponent);
+    }
+
+    // Удаляем старые компоненты
+    remove(prevPointComponent);
+    remove(prevEditPointComponent);
   }
 
-  // Стрелочные функции автоматически привязывают контекст
+  #handleFavoriteClick = () => {
+    const updatedPoint = {
+      ...this.#point,
+      isFavorite: !this.#point.isFavorite
+    };
+    this.#onDataChange(updatedPoint);
+  };
+
   #handleEditClick = () => {
     this.#replacePointToForm();
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -80,6 +111,8 @@ export default class PointPresenter {
     replace(this.#pointComponent, this.#editPointComponent);
   };
 
-  // destroy() {
-  // }
+  destroy() {
+    remove(this.#pointComponent);
+    remove(this.#editPointComponent);
+  }
 }
