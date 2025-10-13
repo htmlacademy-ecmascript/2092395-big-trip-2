@@ -3,6 +3,7 @@ import EventListView from '../view/event-list-view.js';
 import SortView from '../view/sort-view.js';
 import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
+import { updateItem } from '../utils/common.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -15,6 +16,21 @@ export default class BoardPresenter {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
   }
+
+  #handlePointChange = (updatedPoint) => {
+    // Обновляем локальное состояние
+    this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
+
+    // Обновляем данные в модели
+    this.#pointsModel.updatePoint('MINOR', updatedPoint);
+
+    // Обновляем презентер точки
+    const pointPresenter = this.#pointPresenters.get(updatedPoint.id);
+    if (pointPresenter) {
+      pointPresenter.init(updatedPoint);
+    }
+  };
+
 
   init() {
     // Получаем данные из модели
@@ -63,7 +79,8 @@ export default class BoardPresenter {
       destination: destination,
       allOffers: allOffers,
       pointsModel: this.#pointsModel,
-      container: this.#boardComponent.element
+      container: this.#boardComponent.element,
+      onDataChange: this.#handlePointChange,
     });
 
     // Инициализируем презентер
