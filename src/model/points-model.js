@@ -4,6 +4,7 @@ import { mockOffers } from '../mock/offers.js';
 import { humanizePointDate } from '../utils/point.js';
 import { POINT_COUNT } from '../const.js';
 import { generateFilter } from '../mock/filter.js';
+import { updateItem } from '../utils/common.js';
 
 // Создаем заготовку для модели
 export default class PointsModel {
@@ -19,6 +20,10 @@ export default class PointsModel {
 
   get points() {
     return this.#points;
+  }
+
+  updatePoint(updateType, update) {
+    this.#points = updateItem(this.#points, update);
   }
 
   get offers() {
