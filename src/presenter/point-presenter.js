@@ -2,6 +2,11 @@ import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export default class PointPresenter {
   #point = null;
   #offers = null;
@@ -12,8 +17,10 @@ export default class PointPresenter {
   #editPointComponent = null;
   #container = null;
   #onDataChange = null;
+  #handleModeChange = null;
+  #mode = Mode.DEFAULT;
 
-  constructor({ point, offers, destination, allOffers, pointsModel, container, onDataChange }) {
+  constructor({ point, offers, destination, allOffers, pointsModel, container, onDataChange, onModeChange }) {
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
@@ -21,6 +28,7 @@ export default class PointPresenter {
     this.#pointsModel = pointsModel;
     this.#container = container;
     this.#onDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init(point = this.#point) {
@@ -59,11 +67,11 @@ export default class PointPresenter {
     }
 
     // Заменяем компоненты, если они отрендерены
-    if (prevPointComponent && this.#container.contains(prevPointComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
 
-    if (prevEditPointComponent && this.#container.contains(prevEditPointComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#editPointComponent, prevEditPointComponent);
     }
 
@@ -105,14 +113,23 @@ export default class PointPresenter {
 
   #replacePointToForm = () => {
     replace(this.#editPointComponent, this.#pointComponent);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   };
 
   #replaceFormToPoint = () => {
     replace(this.#pointComponent, this.#editPointComponent);
+    this.#mode = Mode.DEFAULT;
   };
 
   destroy() {
     remove(this.#pointComponent);
     remove(this.#editPointComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToPoint();
+    }
   }
 }

@@ -17,6 +17,10 @@ export default class BoardPresenter {
     this.#pointsModel = pointsModel;
   }
 
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
   #handlePointChange = (updatedPoint) => {
     // Обновляем локальное состояние
     this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
@@ -81,6 +85,7 @@ export default class BoardPresenter {
       pointsModel: this.#pointsModel,
       container: this.#boardComponent.element,
       onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange,
     });
 
     // Инициализируем презентер
