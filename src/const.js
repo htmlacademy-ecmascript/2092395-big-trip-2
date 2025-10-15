@@ -47,7 +47,7 @@ const DATE_FORMAT = 'MMMM D';
 const TIME_FORMAT = 'HH:mm';
 
 const SortType = {
-  DATE: 'date',
+  DAY: 'day',
   TIME: 'time',
   PRICE: 'price',
 };
