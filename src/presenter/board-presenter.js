@@ -11,6 +11,7 @@ export default class BoardPresenter {
   #boardComponent = new EventListView();
   #boardPoints = [];
   #pointPresenters = new Map();
+  #sortComponent = null;
 
   constructor({ boardContainer, pointsModel }) {
     this.#boardContainer = boardContainer;
@@ -34,6 +35,20 @@ export default class BoardPresenter {
       pointPresenter.init(updatedPoint);
     }
   };
+
+  #handleSortTypeChange = (sortType) => {
+    // Сортируем
+    // Чистим список
+    // Рендерим список заново
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    render(this.#sortComponent, this.#boardComponent.element);
+  }
 
 
   init() {
