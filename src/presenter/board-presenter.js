@@ -47,26 +47,32 @@ export default class BoardPresenter {
   // потому что для сортировки мы будем мутировать
   // массив в свойстве _boardPoints
   #sortPoints(sortType) {
+    // Создаем копию массива для сортировки
+    let pointsToSort = [...this.#boardPoints];
+
     switch (sortType) {
       case SortType.DAY:
-        this.#boardPoints.sort(sortPointsDay);
-        break;
-      case SortType.PRICE:
-        this.#boardPoints.sort(sortPointsPrice);
+        pointsToSort.sort(sortPointsDay);
         break;
       case SortType.TIME:
-        this.#boardPoints.sort(sortPointsTime);
+        pointsToSort.sort(sortPointsTime);
+        break;
+      case SortType.PRICE:
+        pointsToSort.sort(sortPointsPrice);
         break;
       default:
-        // 3. А когда пользователь захочет "вернуть всё, как было",
-        // мы просто запишем в _boardPoints исходный массив
-        this.#boardPoints = [...this.#sourcedBoardPoints];
+        // Возвращаем исходный порядок
+        pointsToSort = [...this.#sourcedBoardPoints];
     }
 
+    this.#boardPoints = pointsToSort;
     this.#currentSortType = sortType;
   }
 
   #handleSortTypeChange = (sortType) => {
+    if (!sortType) {
+      return;
+    }
     // Проверяем выбранный вариант сортировки не является ли действующим
     if (this.#currentSortType === sortType) {
       return;
