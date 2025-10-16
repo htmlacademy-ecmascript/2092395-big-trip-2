@@ -28,7 +28,7 @@ const DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.'];
 
-  const FILTERS = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
@@ -57,5 +57,5 @@ export {
   DATE_FORMAT,
   TIME_FORMAT,
   POINT_COUNT,
-  FILTERS,
+  FilterType,
 };

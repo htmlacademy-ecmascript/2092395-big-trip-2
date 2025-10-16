@@ -1,4 +1,4 @@
-import { getRandomBoolean } from '../utils.js';
+import { getRandomBoolean } from '../utils/common.js';
 
 const mockOffers = [
   {

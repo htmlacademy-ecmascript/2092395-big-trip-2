@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils.js';
+import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils/point.js';
 
 function createOfferTemplate({ title, price }) {
   return (

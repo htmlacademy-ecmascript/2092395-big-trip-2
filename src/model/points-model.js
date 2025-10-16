@@ -1,8 +1,9 @@
 import { getRandomPoint } from '../mock/points.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { mockOffers } from '../mock/offers.js';
-import { humanizePointDate } from '../utils.js';
+import { humanizePointDate } from '../utils/point.js';
 import { POINT_COUNT } from '../const.js';
+import { generateFilter } from '../mock/filter.js';
 
 // Создаем заготовку для модели
 export default class PointsModel {
@@ -96,44 +97,8 @@ export default class PointsModel {
     }, 0);
   }
 
- // Метод для получения информации о доступных фильтрах
+  // Метод для получения информации о доступных фильтрах
   getAvailableFilters() {
-    // Получаем все точки маршрута из модели
-    const points = this.#points;
-    // Получаем текущую дату и время для сравнения
-    const now = new Date();
-
-    // Возвращаем массив объектов с информацией о каждом фильтре
-    return [
-      {
-        type: 'everything',      // Тип фильтра
-        name: 'Everything',      // Отображаемое имя
-        isChecked: true,         // Выбран ли фильтр по умолчанию
-        isDisabled: points.length === 0  // Блокировать, если нет точек
-      },
-      {
-        type: 'future',
-        name: 'Future',
-        isChecked: false,
-        // Блокировать, если нет точек с датой начала в будущем
-        isDisabled: !points.some(point => new Date(point.dateFrom) > now)
-      },
-      {
-        type: 'present',
-        name: 'Present',
-        isChecked: false,
-        // Блокировать, если нет текущих точек (начались, но не закончились)
-        isDisabled: !points.some(point =>
-          new Date(point.dateFrom) <= now && new Date(point.dateTo) >= now
-        )
-      },
-      {
-        type: 'past',
-        name: 'Past',
-        isChecked: false,
-        // Блокировать, если нет завершенных точек
-        isDisabled: !points.some(point => new Date(point.dateTo) < now)
-      }
-    ];
+    return generateFilter(this.#points);
   }
 }
