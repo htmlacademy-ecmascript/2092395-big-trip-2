@@ -9,13 +9,12 @@ const isPointPresent = (point) => {
 };
 const isPointPast = (point) => new Date(point.dateTo) < new Date();
 
-// Объект с фильтрами (как в вашем примере с задачами)
+// Объект с фильтрами
 const filter = {
-  [FilterType.EVERYTHING]: (points) => points.filter((point) => point), // Все точки
+  [FilterType.EVERYTHING]: (points) => points.filter((point) => point),
   [FilterType.FUTURE]: (points) => points.filter((point) => isPointFuture(point)),
   [FilterType.PRESENT]: (points) => points.filter((point) => isPointPresent(point)),
   [FilterType.PAST]: (points) => points.filter((point) => isPointPast(point)),
 };
 
-// Экспортируем объект фильтров и функции-предикаты
 export { filter, isPointFuture, isPointPresent, isPointPast };

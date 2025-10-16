@@ -2,6 +2,7 @@ import { getRandomArrayElement, getRandomInteger, getRandomBoolean } from '../ut
 import { mockDestinations } from './destinations.js';
 import { TYPE_OF_EVENTS, MIN_PRICE, MAX_PRICE } from '../const.js';
 import { mockOffers } from '../mock/offers.js';
+import { nanoid } from 'nanoid';
 
 function getRandomOffers(offersType) {
   if (!offersType || !offersType.offers) {
@@ -17,7 +18,7 @@ function getRandomPoint() {
   const randomDestination = getRandomArrayElement(mockDestinations);
 
   return {
-    id: '',
+    id: nanoid(),
     basePrice: getRandomInteger(MIN_PRICE, MAX_PRICE),
     dateFrom: new Date('2018-03-18T10:30:00'),
     dateTo: new Date('2018-04-18T11:00:00'),
