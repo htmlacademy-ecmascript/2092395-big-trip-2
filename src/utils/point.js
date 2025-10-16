@@ -29,8 +29,21 @@ function getDifferenceInTime(dateStart, dateEnd) {
   }
 }
 
+const sortPointsDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+
+const sortPointsTime = (pointA, pointB) => {
+  const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const durationB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  return durationB - durationA; // Сортировка по убыванию длительности
+};
+
+const sortPointsPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice; // По убыванию цены
+
 export {
   humanizePointDate,
   humanizePointTime,
   getDifferenceInTime,
+  sortPointsDay,
+  sortPointsTime,
+  sortPointsPrice,
 };

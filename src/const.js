@@ -46,6 +46,12 @@ const MAX_PHOTO_INDEX = 5;
 const DATE_FORMAT = 'MMMM D';
 const TIME_FORMAT = 'HH:mm';
 
+const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
 export {
   TYPE_OF_EVENTS,
   CITIES,
@@ -58,4 +64,5 @@ export {
   TIME_FORMAT,
   POINT_COUNT,
   FilterType,
+  SortType,
 };

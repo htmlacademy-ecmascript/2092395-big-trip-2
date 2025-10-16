@@ -4,6 +4,8 @@ import SortView from '../view/sort-view.js';
 import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
 import { updateItem } from '../utils/common.js';
+import { sortPointsDay, sortPointsTime, sortPointsPrice } from '../utils/point.js';
+import { SortType } from '../const.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -11,6 +13,9 @@ export default class BoardPresenter {
   #boardComponent = new EventListView();
   #boardPoints = [];
   #pointPresenters = new Map();
+  #sortComponent = null;
+  #currentSortType = SortType.DAY;
+  #sourcedBoardPoints = [];
 
   constructor({ boardContainer, pointsModel }) {
     this.#boardContainer = boardContainer;
@@ -28,6 +33,9 @@ export default class BoardPresenter {
     // Обновляем данные в модели
     this.#pointsModel.updatePoint('MINOR', updatedPoint);
 
+    // Обновляем данные в копии
+    this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatedPoint);
+
     // Обновляем презентер точки
     const pointPresenter = this.#pointPresenters.get(updatedPoint.id);
     if (pointPresenter) {
@@ -35,10 +43,67 @@ export default class BoardPresenter {
     }
   };
 
+  // 2. Этот исходный массив задач необходим,
+  // потому что для сортировки мы будем мутировать
+  // массив в свойстве _boardPoints
+  #sortPoints(sortType) {
+    // Создаем копию массива для сортировки
+    let pointsToSort = [...this.#boardPoints];
+
+    switch (sortType) {
+      case SortType.DAY:
+        pointsToSort.sort(sortPointsDay);
+        break;
+      case SortType.TIME:
+        pointsToSort.sort(sortPointsTime);
+        break;
+      case SortType.PRICE:
+        pointsToSort.sort(sortPointsPrice);
+        break;
+      default:
+        // Возвращаем исходный порядок
+        pointsToSort = [...this.#sourcedBoardPoints];
+    }
+
+    this.#boardPoints = pointsToSort;
+    this.#currentSortType = sortType;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (!sortType) {
+      return;
+    }
+    // Проверяем выбранный вариант сортировки не является ли действующим
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    // Чистим список
+    this.#clearPoints();
+
+    // Рендерим список заново
+    this.#renderPoints();
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView({
+      currentSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    render(this.#sortComponent, this.#boardComponent.element);
+  }
+
 
   init() {
     // Получаем данные из модели
     this.#boardPoints = [...this.#pointsModel.points];
+
+    // 1. В отличии от сортировки по любому параметру,
+    // исходный порядок можно сохранить только одним способом -
+    // сохранив исходный массив:
+    this.#sourcedBoardPoints = [...this.#pointsModel.points];
 
     // Запускаем рендеринг доски
     this.#renderBoard();
@@ -47,8 +112,9 @@ export default class BoardPresenter {
   #renderBoard() {
     // Рендерим контейнер для точек
     render(this.#boardComponent, this.#boardContainer);
+
     // Рендерим сортировку
-    render(new SortView(), this.#boardComponent.element);
+    this.#renderSort();
 
     // Проверяем есть ли точки
     if (this.#boardPoints.length === 0) {
