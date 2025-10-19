@@ -49,7 +49,12 @@ export default class PointsModel {
 
   getDestinationsById(id) {
     const allDestinations = this.#destinations;
-    return allDestinations.find((item) => item.id === id) ?? null;
+    return allDestinations.find((item) => item.id === id) || null;
+  }
+
+    getDestinationsByName(name) {
+    const allDestinations = this.#destinations;
+    return allDestinations.find((item) => item.name === name) || null;
   }
 
   /* Методы для вычисления данных хедера */

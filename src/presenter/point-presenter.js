@@ -52,9 +52,7 @@ export default class PointPresenter {
 
     this.#editPointComponent = new EditPointView({
       point: this.#point,
-      offers: this.#allOffers,
-      checkedOffers: this.#offers,
-      destination: this.#destination,
+      pointsModel: this.#pointsModel,
       onFormSubmit: this.#handleFormSubmit,
       onCloseClick: this.#handleCloseClick
     });
@@ -93,12 +91,25 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = () => {
+  #handleCloseClick = () => {
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleCloseClick = () => {
+  #handleFormSubmit = (updatedPoint) => {
+    if (updatedPoint === null) {
+      // Логика удаления
+      this.#onDataChange({...this.#point, isDeleted: true});
+    } else {
+      // Логика обновления - убедимся, что все данные актуальны
+      const finalPoint = {
+        ...this.#point, // сохраняем оригинальные данные
+        ...updatedPoint // применяем обновления
+      };
+      this.#onDataChange(finalPoint);
+    }
+
+    // Закрываем форму
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
@@ -106,6 +117,12 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      // Сбрасываем состояние сохранения если было
+      if (this.#editPointComponent && this.#editPointComponent._state.isSaving) {
+        this.#editPointComponent.updateElement({
+          isSaving: false
+        });
+      }
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
