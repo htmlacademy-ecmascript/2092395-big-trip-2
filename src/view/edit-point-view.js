@@ -15,7 +15,7 @@ function createTypeTemplate(type, currentType) {
 
 function createOfferTemplate(offer, checkedOffers) {
   const { id, title, price } = offer;
-  const isChecked = checkedOffers.some(checkedOffer => checkedOffer.id === id) ? 'checked' : '';
+  const isChecked = checkedOffers.some((checkedOffer) => checkedOffer.id === id) ? 'checked' : '';
 
   return (
     `<div class="event__offer-selector">
@@ -158,28 +158,12 @@ export default class EditPointView extends AbstractStatefulView {
 
   constructor({ point, pointsModel, onFormSubmit, onCloseClick }) {
     super();
-
     this.#pointsModel = pointsModel;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleCloseClick = onCloseClick;
 
     this._setState(EditPointView.parsePointToState(point));
     this._restoreHandlers();
-  }
-
-  static parsePointToState(point) {
-    return {
-      ...point,
-      isSaving: false,
-      isDeleting: false
-    };
-  }
-
-  static parseStateToPoint(state) {
-    const point = { ...state };
-    delete point.isSaving;
-    delete point.isDeleting;
-    return point;
   }
 
   get template() {
@@ -192,6 +176,13 @@ export default class EditPointView extends AbstractStatefulView {
       availableOffers,
       currentOffers,
       currentDestination
+    );
+  }
+
+  //Метод для сброса состояния
+  reset(point) {
+    this.updateElement(
+      EditPointView.parsePointToState(point)
     );
   }
 
@@ -214,14 +205,7 @@ export default class EditPointView extends AbstractStatefulView {
   #setPriceChangeHandler() {
     const priceInput = this.element.querySelector('.event__input--price');
     if (priceInput) {
-      // Просто обновляем состояние без перерисовки
-      priceInput.addEventListener('input', (evt) => {
-        const newPrice = parseInt(evt.target.value, 10);
-        if (!isNaN(newPrice) && newPrice >= 0) {
-          // Обновляем состояние без вызова updateElement
-          this._state.basePrice = newPrice;
-        }
-      });
+      priceInput.addEventListener('input', this.#priceInputHandler);
     }
   }
 
@@ -246,16 +230,23 @@ export default class EditPointView extends AbstractStatefulView {
     });
   }
 
-  #typeChangeHandler = (evt) => {
-    const newType = evt.target.value;
+  #priceInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      basePrice: parseInt(evt.target.value, 10) || 0
+    });
+  };
 
+  #typeChangeHandler = (evt) => {
+    evt.preventDefault();
     this.updateElement({
-      type: newType,
+      type: evt.target.value,
       offers: [] // Сбрасываем выбранные офферы при смене типа
     });
   };
 
   #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
     const destinationName = evt.target.value;
     const newDestination = this.#pointsModel.getDestinationsByName(destinationName);
 
@@ -267,13 +258,14 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #offersChangeHandler = (evt) => {
+    evt.preventDefault();
     const offerId = evt.target.id;
     const isChecked = evt.target.checked;
     const currentOffers = [...this._state.offers || []];
 
     const newOffers = isChecked
       ? [...currentOffers, offerId]
-      : currentOffers.filter(id => id !== offerId);
+      : currentOffers.filter((id) => id !== offerId);
 
     this.updateElement({
       offers: newOffers
@@ -288,13 +280,25 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleFormSubmit(null);
   };
 
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+
+    // Собираем актуальные данные перед отправкой
+    const formData = this.#getFormData();
+    const pointData = EditPointView.parseStateToPoint({
+      ...this._state,
+      ...formData
+    });
+
+    this.updateElement({
+      isSaving: true
+    });
+
+    this.#handleFormSubmit(pointData);
+  };
+
   #getFormData() {
     const formData = {};
-
-    // Получаем цену из состояния (уже обновлена через обработчик)
-    if (this._state.basePrice !== undefined) {
-      formData.basePrice = this._state.basePrice;
-    }
 
     // Получаем направление из инпута
     const destinationInput = this.element.querySelector('.event__input--destination');
@@ -309,25 +313,23 @@ export default class EditPointView extends AbstractStatefulView {
     return formData;
   }
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-
-    // Собираем все актуальные данные из формы
-    const formData = this.#getFormData();
-    const pointData = EditPointView.parseStateToPoint({
-      ...this._state,
-      ...formData
-    });
-
-    this.updateElement({
-      isSaving: true
-    });
-
-    this.#handleFormSubmit(pointData);
-  };
-
   #closeClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleCloseClick();
   };
+
+  static parsePointToState(point) {
+    return {
+      ...point,
+      isSaving: false,
+      isDeleting: false
+    };
+  }
+
+  static parseStateToPoint(state) {
+    const point = { ...state };
+    delete point.isSaving;
+    delete point.isDeleting;
+    return point;
+  }
 }

@@ -92,6 +92,8 @@ export default class PointPresenter {
   };
 
   #handleCloseClick = () => {
+    // ВАЖНО: Сбрасываем состояние при закрытии стрелкой
+    this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
@@ -101,15 +103,16 @@ export default class PointPresenter {
       // Логика удаления
       this.#onDataChange({...this.#point, isDeleted: true});
     } else {
-      // Логика обновления - убедимся, что все данные актуальны
+      // Логика обновления
       const finalPoint = {
-        ...this.#point, // сохраняем оригинальные данные
-        ...updatedPoint // применяем обновления
+        ...this.#point,
+        ...updatedPoint
       };
       this.#onDataChange(finalPoint);
     }
 
-    // Закрываем форму
+    // Сбрасываем состояние формы после удаления или сохранения
+    this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
@@ -117,12 +120,8 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      // Сбрасываем состояние сохранения если было
-      if (this.#editPointComponent && this.#editPointComponent._state.isSaving) {
-        this.#editPointComponent.updateElement({
-          isSaving: false
-        });
-      }
+      // ВАЖНО: Сбрасываем форму к исходным данным
+      this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
@@ -146,6 +145,8 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      // ВАЖНО: Сбрасываем форму при смене режима
+      this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
   }
