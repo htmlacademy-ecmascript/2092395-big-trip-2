@@ -232,9 +232,17 @@ export default class EditPointView extends AbstractStatefulView {
 
   #priceInputHandler = (evt) => {
     evt.preventDefault();
-    this._setState({
-      basePrice: parseInt(evt.target.value, 10) || 0
-    });
+    const value = parseInt(evt.target.value, 10);
+    // Добавляем валидацию цены
+    if (value < 0 || isNaN(value)) {
+      this._setState({
+        basePrice: 0
+      });
+    } else {
+      this._setState({
+        basePrice: value
+      });
+    }
   };
 
   #typeChangeHandler = (evt) => {
