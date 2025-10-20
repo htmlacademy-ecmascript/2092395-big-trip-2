@@ -75,7 +75,7 @@ function createDestinationTemplate(destination) {
 }
 
 function createDestinationList(destination) {
-  return `<option value="${destination.name}"></option>`;
+  return `<option value="${destination.name}">${destination.name}</option>`;
 }
 
 function createEditPointTemplate(point, offers, checkedOffers, destination) {
@@ -171,11 +171,12 @@ export default class EditPointView extends AbstractStatefulView {
     const currentDestination = this.#pointsModel.getDestinationsById(this._state.destination);
     const availableOffers = this.#pointsModel.getOffersByType(this._state.type);
 
+
     return createEditPointTemplate(
       this._state,
       availableOffers,
       currentOffers,
-      currentDestination
+      currentDestination,
     );
   }
 

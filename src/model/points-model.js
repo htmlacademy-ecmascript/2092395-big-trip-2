@@ -52,7 +52,7 @@ export default class PointsModel {
     return allDestinations.find((item) => item.id === id) || null;
   }
 
-    getDestinationsByName(name) {
+  getDestinationsByName(name) {
     const allDestinations = this.#destinations;
     return allDestinations.find((item) => item.name === name) || null;
   }
