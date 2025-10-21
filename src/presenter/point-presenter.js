@@ -52,9 +52,7 @@ export default class PointPresenter {
 
     this.#editPointComponent = new EditPointView({
       point: this.#point,
-      offers: this.#allOffers,
-      checkedOffers: this.#offers,
-      destination: this.#destination,
+      pointsModel: this.#pointsModel,
       onFormSubmit: this.#handleFormSubmit,
       onCloseClick: this.#handleCloseClick
     });
@@ -93,12 +91,28 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = () => {
+  #handleCloseClick = () => {
+    // ВАЖНО: Сбрасываем состояние при закрытии стрелкой
+    this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleCloseClick = () => {
+  #handleFormSubmit = (updatedPoint) => {
+    if (updatedPoint === null) {
+      // Логика удаления
+      this.#onDataChange({...this.#point, isDeleted: true});
+    } else {
+      // Логика обновления
+      const finalPoint = {
+        ...this.#point,
+        ...updatedPoint
+      };
+      this.#onDataChange(finalPoint);
+    }
+
+    // Сбрасываем состояние формы после удаления или сохранения
+    this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
@@ -106,6 +120,8 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      // ВАЖНО: Сбрасываем форму к исходным данным
+      this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
@@ -129,6 +145,8 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      // ВАЖНО: Сбрасываем форму при смене режима
+      this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
   }

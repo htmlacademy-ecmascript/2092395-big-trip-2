@@ -27,7 +27,7 @@ export default class BoardPresenter {
   };
 
   #handlePointChange = (updatedPoint) => {
-    // Обновляем локальное состояние
+  // Обновляем локальное состояние
     this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
 
     // Обновляем данные в модели
@@ -36,10 +36,10 @@ export default class BoardPresenter {
     // Обновляем данные в копии
     this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatedPoint);
 
-    // Обновляем презентер точки
+    // Обновляем презентер точки - передаем обновленную точку
     const pointPresenter = this.#pointPresenters.get(updatedPoint.id);
     if (pointPresenter) {
-      pointPresenter.init(updatedPoint);
+      pointPresenter.init(updatedPoint); // ← важно передать обновленную точку
     }
   };
 
