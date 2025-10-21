@@ -14,19 +14,22 @@ function humanizePointTime(date) {
 }
 
 function getDifferenceInTime(dateStart, dateEnd) {
-  const timeDuration = dayjs.duration(dayjs(dateEnd).diff(dateStart));
-  const days = timeDuration.days();
+  const diffInMs = dayjs(dateEnd).diff(dayjs(dateStart));
+  const timeDuration = dayjs.duration(diffInMs);
+
+  const days = Math.floor(timeDuration.asDays());
   const hours = timeDuration.hours();
   const minutes = timeDuration.minutes();
 
-  switch (true) {
-    case days > 0:
-      return `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
-    case hours > 0:
-      return `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
-    default:
-      return `${minutes}M`;
+  if (days > 0) {
+    return `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
   }
+
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+  }
+
+  return `${minutes}M`;
 }
 
 const sortPointsDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
