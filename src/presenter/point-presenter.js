@@ -92,7 +92,7 @@ export default class PointPresenter {
   };
 
   #handleCloseClick = () => {
-    // ВАЖНО: Сбрасываем состояние при закрытии стрелкой
+    // Сбрасываем состояние при закрытии стрелкой
     this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -120,7 +120,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      // ВАЖНО: Сбрасываем форму к исходным данным
+      // Сбрасываем форму к исходным данным
       this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -145,7 +145,7 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
-      // ВАЖНО: Сбрасываем форму при смене режима
+      // Сбрасываем форму при смене режима
       this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
