@@ -157,24 +157,30 @@ export default class EditPointView extends AbstractStatefulView {
   #pointsModel = null;
   #handleFormSubmit = null;
   #handleCloseClick = null;
+  #handleDeleteClick = null;
   #datepickerStart = null;
   #datepickerEnd = null;
 
-  constructor({ point, pointsModel, onFormSubmit, onCloseClick }) {
+  constructor({ point, pointsModel, onFormSubmit, onCloseClick, onDeleteClick }) {
     super();
     this.#pointsModel = pointsModel;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleCloseClick = onCloseClick;
+    this.#handleDeleteClick = onDeleteClick;
 
     this._setState(EditPointView.parsePointToState(point));
     this._restoreHandlers();
   }
 
   get template() {
-    const currentOffers = this.#pointsModel.getOffersById(this._state.type, this._state.offers || []);
-    const currentDestination = this.#pointsModel.getDestinationsById(this._state.destination);
-    const availableOffers = this.#pointsModel.getOffersByType(this._state.type);
+    const currentOffers = this.#pointsModel ?
+      [...this.#pointsModel.getOffersById(this._state.type, this._state.offers || [])] : [];
 
+    const currentDestination = this.#pointsModel ?
+      this.#pointsModel.getDestinationsById(this._state.destination) : null;
+
+    const availableOffers = this.#pointsModel ?
+      this.#pointsModel.getOffersByType(this._state.type) : null;
 
     return createEditPointTemplate(
       this._state,
@@ -198,7 +204,6 @@ export default class EditPointView extends AbstractStatefulView {
     }
   }
 
-  //Метод для сброса состояния
   reset(point) {
     this.updateElement(
       EditPointView.parsePointToState(point)
@@ -213,7 +218,7 @@ export default class EditPointView extends AbstractStatefulView {
       .addEventListener('click', this.#closeClickHandler);
 
     this.element.querySelector('.event__reset-btn')
-      .addEventListener('click', this.#deleteClickHandler);
+      .addEventListener('click', this.#resetClickHandler);
 
     this.#setPriceChangeHandler();
     this.#setTypeChangeHandler();
@@ -254,7 +259,7 @@ export default class EditPointView extends AbstractStatefulView {
   #priceInputHandler = (evt) => {
     evt.preventDefault();
     const value = parseInt(evt.target.value, 10);
-    // Добавляем валидацию цены
+
     if (value < 0 || isNaN(value)) {
       this._setState({
         basePrice: 0
@@ -270,18 +275,30 @@ export default class EditPointView extends AbstractStatefulView {
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value,
-      offers: [] // Сбрасываем выбранные офферы при смене типа
+      offers: []
     });
   };
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
     const destinationName = evt.target.value;
+
+    if (!this.#pointsModel) {
+      this._setState({
+        destination: destinationName
+      });
+      return;
+    }
+
     const newDestination = this.#pointsModel.getDestinationsByName(destinationName);
 
     if (newDestination) {
       this.updateElement({
         destination: newDestination.id
+      });
+    } else {
+      this._setState({
+        destination: destinationName
       });
     }
   };
@@ -301,18 +318,22 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #deleteClickHandler = (evt) => {
+  #resetClickHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      isDeleting: true
-    });
-    this.#handleFormSubmit(null);
+
+    if (this.#pointsModel && this.#handleDeleteClick) {
+      this.updateElement({
+        isDeleting: true
+      });
+      this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
+    } else {
+      this.#handleCloseClick();
+    }
   };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
-    // Собираем актуальные данные перед отправкой
     const formData = this.#getFormData();
     const pointData = EditPointView.parseStateToPoint({
       ...this._state,
@@ -329,13 +350,19 @@ export default class EditPointView extends AbstractStatefulView {
   #getFormData() {
     const formData = {};
 
-    // Получаем направление из инпута
     const destinationInput = this.element.querySelector('.event__input--destination');
     if (destinationInput) {
       const destinationName = destinationInput.value;
-      const destination = this.#pointsModel.getDestinationsByName(destinationName);
-      if (destination) {
-        formData.destination = destination.id;
+
+      if (this.#pointsModel) {
+        const destination = this.#pointsModel.getDestinationsByName(destinationName);
+        if (destination) {
+          formData.destination = destination.id;
+        } else {
+          formData.destination = destinationName;
+        }
+      } else {
+        formData.destination = destinationName;
       }
     }
 
@@ -369,7 +396,7 @@ export default class EditPointView extends AbstractStatefulView {
           enableTime: true,
           'time_24hr': true,
           defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler, // Устанавливаем обработчик на изменение даты
+          onChange: this.#dateFromChangeHandler,
         },
       );
     }
@@ -385,7 +412,7 @@ export default class EditPointView extends AbstractStatefulView {
           enableTime: true,
           'time_24hr': true,
           defaultDate: this._state.dateTo,
-          onChange: this.#dateToChangeHandler, // Устанавливаем обработчик на изменение даты
+          onChange: this.#dateToChangeHandler,
         },
       );
     }

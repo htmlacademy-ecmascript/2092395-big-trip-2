@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DATE_FORMAT, TIME_FORMAT, } from '../const.js';
+import { DATE_FORMAT, TIME_FORMAT } from '../const.js';
 
 // Расширяем dayjs плагином duration
 dayjs.extend(duration);
@@ -14,6 +14,10 @@ function humanizePointTime(date) {
 }
 
 function getDifferenceInTime(dateStart, dateEnd) {
+  if (!dateStart || !dateEnd) {
+    return '';
+  }
+
   const diffInMs = dayjs(dateEnd).diff(dayjs(dateStart));
   const timeDuration = dayjs.duration(diffInMs);
 
@@ -22,7 +26,7 @@ function getDifferenceInTime(dateStart, dateEnd) {
   const minutes = timeDuration.minutes();
 
   if (days > 0) {
-    return `${days}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+    return `${days.toString().padStart(2, '0')}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
   }
 
   if (hours > 0) {
@@ -32,7 +36,12 @@ function getDifferenceInTime(dateStart, dateEnd) {
   return `${minutes}M`;
 }
 
-const sortPointsDay = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+// Функции сортировки
+const sortPointsDay = (pointA, pointB) => {
+  const dateA = dayjs(pointA.dateFrom);
+  const dateB = dayjs(pointB.dateFrom);
+  return dateA.diff(dateB);
+};
 
 const sortPointsTime = (pointA, pointB) => {
   const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
@@ -40,7 +49,36 @@ const sortPointsTime = (pointA, pointB) => {
   return durationB - durationA; // Сортировка по убыванию длительности
 };
 
-const sortPointsPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice; // По убыванию цены
+const sortPointsPrice = (pointA, pointB) => {
+  return pointB.basePrice - pointA.basePrice; // Сортировка по убыванию цены
+};
+
+// Функции для фильтрации
+function isPointFuture(point) {
+  if (!point.dateFrom) {
+    return false;
+  }
+  return dayjs().isBefore(dayjs(point.dateFrom));
+}
+
+function isPointPresent(point) {
+  if (!point.dateFrom || !point.dateTo) {
+    return false;
+  }
+
+  const now = dayjs();
+  const start = dayjs(point.dateFrom);
+  const end = dayjs(point.dateTo);
+
+  return now.isAfter(start) && now.isBefore(end);
+}
+
+function isPointPast(point) {
+  if (!point.dateTo) {
+    return false;
+  }
+  return dayjs().isAfter(dayjs(point.dateTo));
+}
 
 export {
   humanizePointDate,
@@ -49,4 +87,7 @@ export {
   sortPointsDay,
   sortPointsTime,
   sortPointsPrice,
+  isPointFuture,
+  isPointPresent,
+  isPointPast,
 };

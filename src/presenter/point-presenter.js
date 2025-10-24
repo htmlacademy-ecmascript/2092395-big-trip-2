@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
+import { UserAction, UpdateType } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -41,7 +42,7 @@ export default class PointPresenter {
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
-    // Создаем новые компоненты
+    // Создаем компоненты точки и редактирования
     this.#pointComponent = new PointView({
       point: this.#point,
       offers: this.#offers,
@@ -54,17 +55,17 @@ export default class PointPresenter {
       point: this.#point,
       pointsModel: this.#pointsModel,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#handleCloseClick
+      onCloseClick: this.#handleCloseClick,
+      onDeleteClick: this.#handleDeleteClick
     });
 
-    // Если компоненты уже существуют - заменяем их
+    // Первоначальный рендеринг
     if (prevPointComponent === null && prevEditPointComponent === null) {
-      // Первоначальный рендеринг
       render(this.#pointComponent, this.#container);
       return;
     }
 
-    // Заменяем компоненты, если они отрендерены
+    // Замена компонентов при повторном рендеринге
     if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
@@ -79,11 +80,11 @@ export default class PointPresenter {
   }
 
   #handleFavoriteClick = () => {
-    const updatedPoint = {
-      ...this.#point,
-      isFavorite: !this.#point.isFavorite
-    };
-    this.#onDataChange(updatedPoint);
+    this.#onDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      { ...this.#point, isFavorite: !this.#point.isFavorite },
+    );
   };
 
   #handleEditClick = () => {
@@ -92,35 +93,31 @@ export default class PointPresenter {
   };
 
   #handleCloseClick = () => {
-    // Сбрасываем состояние при закрытии стрелкой
     this.#editPointComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = (updatedPoint) => {
-    if (updatedPoint === null) {
-      // Логика удаления
-      this.#onDataChange({...this.#point, isDeleted: true});
-    } else {
-      // Логика обновления
-      const finalPoint = {
-        ...this.#point,
-        ...updatedPoint
-      };
-      this.#onDataChange(finalPoint);
-    }
+  #handleDeleteClick = (point) => {
+    this.#onDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
 
-    // Сбрасываем состояние формы после удаления или сохранения
-    this.#editPointComponent.reset(this.#point);
+  #handleFormSubmit = (updatedPoint) => {
+    this.#onDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      { ...this.#point, ...updatedPoint },
+    );
     this.#replaceFormToPoint();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      // Сбрасываем форму к исходным данным
       this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
       document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -145,7 +142,6 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
-      // Сбрасываем форму при смене режима
       this.#editPointComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }

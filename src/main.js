@@ -1,41 +1,82 @@
 import { render } from './framework/render.js';
-import FilterView from './view/filter-view.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import PointsModel from './model/points-model.js';
+import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 import TripInfoPresenter from './presenter/trip-info-presenter.js';
+import NewPointButtonView from './view/add-new-point-view.js';
 
 // Находим основные DOM-элементы на странице
 const siteHeader = document.querySelector('.page-header');
 const siteHeaderMainElement = siteHeader.querySelector('.trip-main');
-const siteHeaderFilters = siteHeader.querySelector('.trip-controls');
+const siteHeaderFilters = siteHeader.querySelector('.trip-controls__filters');
 
 const siteMain = document.querySelector('.page-main');
 const siteMainElement = siteMain.querySelector('.trip-events');
-// Создаем экземпляр модели данных
+
+// Создаем экземпляры моделей
 const pointsModel = new PointsModel();
+const filterModel = new FilterModel();
 
-// Получаем информацию о доступных фильтрах из модели
-// Модель сама решает, какие фильтры должны быть заблокированы
-const availableFilters = pointsModel.getAvailableFilters();
+/**
+ * Обработчик закрытия формы создания новой точки
+ */
+function handleNewPointFormClose() {
+  newPointButtonComponent.setDisabled(false);
+}
 
-// Создаем компонент фильтров и передаем ему данные о доступности
-const filterComponent = new FilterView(availableFilters);
+/**
+ * Обработчик клика по кнопке "New Event"
+ */
+function handleNewPointButtonClick() {
+  boardPresenter.createPoint();
+  newPointButtonComponent.setDisabled(true);
+}
 
-// Рендерим компонент фильтров в соответствующий контейнер
-render(filterComponent, siteHeaderFilters);
+// Создаем кнопку "New Event"
+const newPointButtonComponent = new NewPointButtonView({
+  onClick: handleNewPointButtonClick
+});
 
-// Создаем презентер доски (управляет списком точек маршрута)
+// Создаем презентер фильтров
+const filterPresenter = new FilterPresenter({
+  filterContainer: siteHeaderFilters,
+  filterModel,
+  pointsModel
+});
+
+// Создаем презентер доски (списка точек маршрута)
 const boardPresenter = new BoardPresenter({
   boardContainer: siteMainElement,
   pointsModel,
+  filterModel,
+  onNewPointDestroy: handleNewPointFormClose
 });
 
-// Создаем презентер информации о поездке (управляет шапкой)
+// Создаем презентер информации о поездке
 const tripInfoPresenter = new TripInfoPresenter({
   container: siteHeaderMainElement,
   pointsModel,
 });
 
-// Инициализируем презентеры (запускаем отрисовку компонентов)
-boardPresenter.init();
-tripInfoPresenter.init();
+/**
+ * Инициализирует приложение
+ */
+function init() {
+  // Удаляем существующую кнопку из HTML если есть
+  const existingButton = siteHeaderMainElement.querySelector('.trip-main__event-add-btn');
+  if (existingButton) {
+    existingButton.remove();
+  }
+
+  // Рендерим нашу кнопку "New Event"
+  render(newPointButtonComponent, siteHeaderMainElement);
+
+  // Инициализируем презентеры
+  filterPresenter.init();
+  boardPresenter.init();
+  tripInfoPresenter.init();
+}
+
+// Запускаем приложение
+init();
