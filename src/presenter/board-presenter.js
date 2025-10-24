@@ -95,6 +95,10 @@ export default class BoardPresenter {
     render(this.#sortComponent, this.#boardComponent.element);
   }
 
+  get points() {
+    return this.#pointsModel.points;
+  }
+
 
   init() {
     // Получаем данные из модели

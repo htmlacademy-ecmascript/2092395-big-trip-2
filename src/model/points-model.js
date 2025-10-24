@@ -1,3 +1,4 @@
+import Observable from '../framework/observable.js';
 import { getRandomPoint } from '../mock/points.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { mockOffers } from '../mock/offers.js';
@@ -7,7 +8,7 @@ import { generateFilter } from '../mock/filter.js';
 import { updateItem } from '../utils/common.js';
 
 // Создаем заготовку для модели
-export default class PointsModel {
+export default class PointsModel extends Observable {
 
   // У конструктора массивов Array вызываем метод from, который позволяет из масиво-подобного объекта получить нормальный массив
   // Вторым аргументом передаем функцию, которая будет применена к каждому элементу массива
