@@ -5,23 +5,24 @@ export default class TripInfoPresenter {
   #container = null;
   #pointsModel = null;
   #tripInfoComponent = null;
-  #isRendered = false;
 
   constructor({ container, pointsModel }) {
     this.#container = container;
     this.#pointsModel = pointsModel;
   }
 
-  init(container = this.#container) {
-    if (container) {
-      this.#container = container;
-    }
+  init() {
+    this.#renderTripInfo();
+  }
 
-    // Если данные еще загружаются, не рендерим
-    if (this.#pointsModel.isLoading) {
-      return;
-    }
+  /**
+   * Обновляет информацию о поездке
+   */
+  update() {
+    this.#renderTripInfo();
+  }
 
+  #renderTripInfo() {
     // Удаляем предыдущий компонент, если он есть
     if (this.#tripInfoComponent) {
       remove(this.#tripInfoComponent);
@@ -41,13 +42,5 @@ export default class TripInfoPresenter {
 
     // Рендерим компонент в переданный контейнер
     render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
-    this.#isRendered = true;
-  }
-
-  // Метод для обновления информации
-  update() {
-    if (this.#isRendered && !this.#pointsModel.isLoading) {
-      this.init();
-    }
   }
 }

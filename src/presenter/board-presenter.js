@@ -24,7 +24,6 @@ export default class BoardPresenter {
 
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
-  #isInitialized = false;
 
   constructor({ boardContainer, pointsModel, filterModel, onNewPointDestroy }) {
     this.#boardContainer = boardContainer;
@@ -32,7 +31,7 @@ export default class BoardPresenter {
     this.#filterModel = filterModel;
 
     this.#newPointPresenter = new NewPointPresenter({
-      pointListContainer: null, // Будет установлен позже
+      pointListContainer: null,
       pointsModel: this.#pointsModel,
       onDataChange: this.#handleViewAction,
       onDestroy: onNewPointDestroy
@@ -45,17 +44,7 @@ export default class BoardPresenter {
   /**
    * Инициализация презентера
    */
-  init(container = this.#boardContainer) {
-    if (container) {
-      this.#boardContainer = container;
-    }
-
-    if (this.#pointsModel.isLoading) {
-      // Если данные еще загружаются, не рендерим доску
-      return;
-    }
-
-    this.#isInitialized = true;
+  init() {
     this.#renderBoard();
   }
 
@@ -120,10 +109,6 @@ export default class BoardPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    if (!this.#isInitialized) {
-      return;
-    }
-
     switch (updateType) {
       case UpdateType.PATCH:
         // Обновляем только конкретную точку
@@ -158,10 +143,6 @@ export default class BoardPresenter {
   };
 
   #renderSort() {
-    if (this.#sortComponent) {
-      remove(this.#sortComponent);
-    }
-
     this.#sortComponent = new SortView({
       currentSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange
@@ -210,10 +191,12 @@ export default class BoardPresenter {
 
     if (this.#noPointComponent) {
       remove(this.#noPointComponent);
+      this.#noPointComponent = null;
     }
 
     if (this.#sortComponent) {
       remove(this.#sortComponent);
+      this.#sortComponent = null;
     }
 
     if (resetSortType) {

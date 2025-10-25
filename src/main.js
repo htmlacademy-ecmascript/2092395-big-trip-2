@@ -20,6 +20,9 @@ class App {
   constructor() {
     this.#pointsModel = new PointsModel();
     this.#filterModel = new FilterModel();
+
+    // Подписываемся на изменения точек маршрута
+    this.#pointsModel.addObserver(this.#handleModelEvent.bind(this));
   }
 
   /**
@@ -78,6 +81,13 @@ class App {
     this.#boardPresenter.init();
     this.#tripInfoPresenter.init();
   }
+
+  #handleModelEvent = (updateType) => {
+    // Обновляем информацию о поездке при любых изменениях точек
+    if (updateType === 'MINOR' || updateType === 'MAJOR' || updateType === 'PATCH') {
+      this.#tripInfoPresenter.update();
+    }
+  };
 
   #handleNewPointFormClose() {
     this.#newPointButtonComponent.setDisabled(false);

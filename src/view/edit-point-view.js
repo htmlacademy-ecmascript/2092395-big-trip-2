@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { TYPE_OF_EVENTS } from '../const.js';
-import { humanizePointDate } from '../utils/point.js';
+import { humanizePointDate, humanizePointTime } from '../utils/point.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
@@ -195,9 +195,8 @@ function createEditPointTemplate(point, offers, checkedOffers, destination, dest
               id="event-start-time-1"
               type="text"
               name="event-start-time"
-              value="${humanizePointDate(dateFrom)}"
+              value="${humanizePointDate(dateFrom)} ${humanizePointTime(dateFrom)}"
               ${inputDisabled}
-              required
             >
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
@@ -206,9 +205,8 @@ function createEditPointTemplate(point, offers, checkedOffers, destination, dest
               id="event-end-time-1"
               type="text"
               name="event-end-time"
-              value="${humanizePointDate(dateTo)}"
+              value="${humanizePointDate(dateTo)} ${humanizePointTime(dateTo)}"
               ${inputDisabled}
-              required
             >
           </div>
 
@@ -258,7 +256,6 @@ export default class EditPointView extends AbstractStatefulView {
   #datepickerStart = null;
   #datepickerEnd = null;
   #isNewPoint = false;
-  #isDestroyed = false;
 
   constructor({ point, pointsModel, onFormSubmit, onCloseClick, onDeleteClick, isNewPoint = false }) {
     super();
@@ -297,7 +294,6 @@ export default class EditPointView extends AbstractStatefulView {
 
   removeElement() {
     super.removeElement();
-    this.#isDestroyed = true;
 
     if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
@@ -311,404 +307,178 @@ export default class EditPointView extends AbstractStatefulView {
   }
 
   reset(point) {
-    if (this.#isDestroyed) {
-      return;
-    }
     this.updateElement(
       EditPointView.parsePointToState(point)
     );
   }
 
-  /**
-   * Анимация встряски для показа ошибки
-   */
   shake(callback) {
-    if (this.#isDestroyed) {
-      return;
-    }
-
     this.element.classList.add('shake');
 
-    const onAnimationEnd = () => {
-      if (this.#isDestroyed) {
-        return;
-      }
+    this.element.addEventListener('animationend', () => {
       this.element.classList.remove('shake');
-      this.element.removeEventListener('animationend', onAnimationEnd);
-      if (callback) {
-        callback();
-      }
-    };
-
-    this.element.addEventListener('animationend', onAnimationEnd);
+      callback?.();
+    }, { once: true });
   }
 
   _restoreHandlers() {
-    if (this.#isDestroyed) {
-      return;
-    }
-
     const form = this.element.querySelector('form');
-    if (form) {
-      // Убираем стандартное поведение формы
-      form.addEventListener('submit', this.#formSubmitHandler);
-    }
+    form.addEventListener('submit', this.#formSubmitHandler);
 
-    // Добавляем обработчик для кнопки закрытия (только для существующих точек)
     if (!this.#isNewPoint) {
-      const rollupButton = this.element.querySelector('.event__rollup-btn');
-      if (rollupButton) {
-        rollupButton.addEventListener('click', this.#closeClickHandler);
-      }
+      const rollupBtn = this.element.querySelector('.event__rollup-btn');
+      rollupBtn.addEventListener('click', this.#closeClickHandler);
     }
 
-    const resetButton = this.element.querySelector('.event__reset-btn');
-    if (resetButton) {
-      resetButton.addEventListener('click', this.#resetClickHandler);
-    }
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+    resetBtn.addEventListener('click', this.#resetClickHandler);
 
     this.#setInnerHandlers();
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
+    this.#setDatepicker();
   }
 
   #setInnerHandlers() {
-    if (this.#isDestroyed) {
-      return;
-    }
-    this.#setPriceChangeHandler();
-    this.#setTypeChangeHandler();
-    this.#setDestinationChangeHandler();
-    this.#setOffersChangeHandler();
-  }
-
-  #setPriceChangeHandler() {
-    const priceInput = this.element.querySelector('.event__input--price');
-    if (priceInput && !this.#isDestroyed) {
-      // Убираем старые обработчики чтобы избежать дублирования
-      priceInput.removeEventListener('input', this.#priceInputHandler);
-      priceInput.removeEventListener('blur', this.#priceBlurHandler);
-
-      priceInput.addEventListener('input', this.#priceInputHandler);
-      priceInput.addEventListener('blur', this.#priceBlurHandler);
-    }
-  }
-
-  #setTypeChangeHandler() {
     const typeInputs = this.element.querySelectorAll('.event__type-input');
     typeInputs.forEach((input) => {
-      if (!this.#isDestroyed) {
-        input.removeEventListener('change', this.#typeChangeHandler);
-        input.addEventListener('change', this.#typeChangeHandler);
-      }
+      input.addEventListener('change', this.#typeChangeHandler);
     });
-  }
 
-  #setDestinationChangeHandler() {
     const destinationInput = this.element.querySelector('.event__input--destination');
-    if (destinationInput && !this.#isDestroyed) {
-      destinationInput.removeEventListener('change', this.#destinationChangeHandler);
-      destinationInput.removeEventListener('input', this.#destinationInputHandler);
+    destinationInput.addEventListener('change', this.#destinationChangeHandler);
 
-      destinationInput.addEventListener('change', this.#destinationChangeHandler);
-      destinationInput.addEventListener('input', this.#destinationInputHandler);
-    }
-  }
+    const priceInput = this.element.querySelector('.event__input--price');
+    priceInput.addEventListener('change', this.#priceChangeHandler);
 
-  #setOffersChangeHandler() {
     const offerCheckboxes = this.element.querySelectorAll('.event__offer-checkbox');
     offerCheckboxes.forEach((checkbox) => {
-      if (!this.#isDestroyed) {
-        checkbox.removeEventListener('change', this.#offersChangeHandler);
-        checkbox.addEventListener('change', this.#offersChangeHandler);
-      }
+      checkbox.addEventListener('change', this.#offersChangeHandler);
     });
   }
 
-  #priceInputHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    // Разрешаем только цифры
-    let value = evt.target.value.replace(/[^\d]/g, '');
+  #setDatepicker() {
+    const [dateFromElement, dateToElement] = this.element.querySelectorAll('.event__input--time');
 
-    // Убираем ведущие нули
-    value = value.replace(/^0+/, '');
+    this.#datepickerStart = flatpickr(
+      dateFromElement,
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
+        maxDate: this._state.dateTo,
+        onChange: this.#dateFromChangeHandler,
+        enableTime: true,
+        'time_24hr': true,
+      }
+    );
 
-    // Если строка пустая, устанавливаем 0
-    if (value === '') {
-      value = '0';
-    }
-
-    evt.target.value = value;
-
-    // Сразу обновляем состояние при вводе
-    this._setState({
-      basePrice: parseInt(value, 10) || 0
-    });
-  };
-
-  #priceBlurHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    let value = parseInt(evt.target.value, 10);
-
-    if (isNaN(value) || value < 0) {
-      value = 0;
-      evt.target.value = '0';
-    }
-
-    this._setState({
-      basePrice: value
-    });
-  };
+    this.#datepickerEnd = flatpickr(
+      dateToElement,
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler,
+        enableTime: true,
+        'time_24hr': true,
+      }
+    );
+  }
 
   #typeChangeHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value,
-      offers: [] // Сбрасываем выбранные предложения при смене типа
+      offers: []
     });
   };
 
   #destinationChangeHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
     evt.preventDefault();
-    const destinationName = evt.target.value.trim();
+    const destinationName = evt.target.value;
+    const destination = this.#pointsModel.getDestinationsByName(destinationName);
 
-    if (!this.#pointsModel) {
-      return;
-    }
-
-    const newDestination = this.#pointsModel.getDestinationsByName(destinationName);
-
-    if (newDestination) {
+    if (destination) {
       this.updateElement({
-        destination: newDestination.id
+        destination: destination.id
       });
-      // Сбрасываем ошибку валидации
-      evt.target.setCustomValidity('');
-    } else {
-      // Показываем ошибку валидации
-      evt.target.setCustomValidity('Please select a destination from the list');
-      evt.target.reportValidity();
     }
   };
 
-  #destinationInputHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    // Сбрасываем кастомную валидацию при вводе
-    evt.target.setCustomValidity('');
-  };
-
-  #offersChangeHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
+  #priceChangeHandler = (evt) => {
     evt.preventDefault();
-    const offerId = evt.target.dataset.offerId;
-    const isChecked = evt.target.checked;
-    const currentOffers = [...this._state.offers || []];
-
-    const newOffers = isChecked
-      ? [...currentOffers, offerId]
-      : currentOffers.filter((id) => id !== offerId);
-
-    this.updateElement({
-      offers: newOffers
+    this._setState({
+      basePrice: parseInt(evt.target.value, 10)
     });
   };
 
-  #resetClickHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
+  #offersChangeHandler = (evt) => {
     evt.preventDefault();
+    const offerId = evt.target.dataset.offerId;
+    const isChecked = evt.target.checked;
+    let offers = [...this._state.offers];
 
-    if (this.#isNewPoint) {
-      // Для новой точки - просто закрываем форму
-      this.#handleCloseClick();
+    if (isChecked) {
+      offers.push(offerId);
     } else {
-      // Для существующей точки - удаляем
-      this.updateElement({
-        isDeleting: true
-      });
-      this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
+      offers = offers.filter((id) => id !== offerId);
     }
+
+    this.updateElement({
+      offers
+    });
+  };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate.toISOString()
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate.toISOString()
+    });
   };
 
   #formSubmitHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-
     evt.preventDefault();
-    evt.stopPropagation();
 
-    // Обновляем состояние с последними значениями из формы
-    this.#updateStateFromForm();
-
-    // Валидация формы
     if (!this.#isFormValid()) {
       this.shake();
       return;
     }
 
     const pointData = EditPointView.parseStateToPoint(this._state);
-
-    this.updateElement({
-      isSaving: true
-    });
-
     this.#handleFormSubmit(pointData);
   };
 
-  #updateStateFromForm() {
-    if (this.#isDestroyed) {
-      return;
-    }
+  #resetClickHandler = (evt) => {
+    evt.preventDefault();
 
-    const priceInput = this.element.querySelector('.event__input--price');
-    const destinationInput = this.element.querySelector('.event__input--destination');
-
-    if (priceInput) {
-      const priceValue = parseInt(priceInput.value, 10) || 0;
-      this._setState({
-        basePrice: priceValue
-      });
+    if (this.#isNewPoint) {
+      this.#handleCloseClick();
+    } else {
+      this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
     }
+  };
 
-    if (destinationInput) {
-      const destinationName = destinationInput.value.trim();
-      const destination = this.#pointsModel?.getDestinationsByName(destinationName);
-      if (destination) {
-        this._setState({
-          destination: destination.id
-        });
-      }
-    }
-  }
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseClick();
+  };
 
   #isFormValid() {
-    if (this.#isDestroyed) {
-      return false;
-    }
-
-    const form = this.element.querySelector('form');
     const destinationInput = this.element.querySelector('.event__input--destination');
-    const priceInput = this.element.querySelector('.event__input--price');
-    const dateFromInput = this.element.querySelector('#event-start-time-1');
-    const dateToInput = this.element.querySelector('#event-end-time-1');
+    const destinationName = destinationInput.value;
+    const destination = this.#pointsModel.getDestinationsByName(destinationName);
 
-    if (!form || !destinationInput || !priceInput || !dateFromInput || !dateToInput) {
-      return false;
-    }
-
-    // Проверка направления
-    const destinationName = destinationInput.value.trim();
-    const destination = this.#pointsModel?.getDestinationsByName(destinationName);
     if (!destination) {
       destinationInput.setCustomValidity('Please select a destination from the list');
       destinationInput.reportValidity();
       return false;
     }
+
     destinationInput.setCustomValidity('');
-
-    // Проверка цены
-    const price = parseInt(priceInput.value, 10);
-    if (isNaN(price) || price < 0) {
-      priceInput.setCustomValidity('Please enter a valid price (≥ 0)');
-      priceInput.reportValidity();
-      return false;
-    }
-    priceInput.setCustomValidity('');
-
-    // Проверка дат
-    if (!dateFromInput.value || !dateToInput.value) {
-      return false;
-    }
-
-    // Проверка что дата окончания позже даты начала
-    const dateFrom = new Date(this._state.dateFrom);
-    const dateTo = new Date(this._state.dateTo);
-    if (dateTo <= dateFrom) {
-      dateToInput.setCustomValidity('End date must be after start date');
-      dateToInput.reportValidity();
-      return false;
-    }
-    dateToInput.setCustomValidity('');
-
     return true;
-  }
-
-  #closeClickHandler = (evt) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    evt.preventDefault();
-    this.#handleCloseClick();
-  };
-
-  #dateFromChangeHandler = ([userDateFrom]) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    this.updateElement({
-      dateFrom: userDateFrom.toISOString(),
-    });
-  };
-
-  #dateToChangeHandler = ([userDateTo]) => {
-    if (this.#isDestroyed) {
-      return;
-    }
-    this.updateElement({
-      dateTo: userDateTo.toISOString(),
-    });
-  };
-
-  #setDatepickerFrom() {
-    if (this.#isDestroyed || !this._state.dateFrom) {
-      return;
-    }
-
-    this.#datepickerStart = flatpickr(
-      this.element.querySelector('#event-start-time-1'),
-      {
-        maxDate: new Date(this._state.dateTo),
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
-        defaultDate: this._state.dateFrom,
-        onChange: this.#dateFromChangeHandler,
-      },
-    );
-  }
-
-  #setDatepickerTo() {
-    if (this.#isDestroyed || !this._state.dateTo) {
-      return;
-    }
-
-    this.#datepickerEnd = flatpickr(
-      this.element.querySelector('#event-end-time-1'),
-      {
-        minDate: new Date(this._state.dateFrom),
-        dateFormat: 'd/m/y H:i',
-        enableTime: true,
-        'time_24hr': true,
-        defaultDate: this._state.dateTo,
-        onChange: this.#dateToChangeHandler,
-      },
-    );
   }
 
   static parsePointToState(point) {

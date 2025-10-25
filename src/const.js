@@ -61,10 +61,10 @@ const UserAction = {
 
 // Типы обновлений
 const UpdateType = {
-  PATCH: 'PATCH', // Обновление одной точки
-  MINOR: 'MINOR', // Незначительное обновление (перерисовка списка)
-  MAJOR: 'MAJOR', // Значительное обновление (перерисовка всей доски)
-  INIT: 'INIT', // Инициализация приложения
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 // Константы для генерации данных
@@ -74,8 +74,8 @@ const MAX_PRICE = 1000;
 const MIN_PHOTO_INDEX = 1;
 const MAX_PHOTO_INDEX = 5;
 
-// Форматы дат и времени
-const DATE_FORMAT = 'MMMM D';
+// Форматы дат и времени - ВАЖНО: правильные форматы
+const DATE_FORMAT = 'DD/MM/YY HH:mm';
 const TIME_FORMAT = 'HH:mm';
 
 export {

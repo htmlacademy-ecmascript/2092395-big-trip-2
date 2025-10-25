@@ -13,7 +13,6 @@ export default class PointsModel extends Observable {
   #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = mockOffers;
   #destinations = mockDestinations;
-  #isLoading = false; // Изменяем на false, так как данные уже есть
 
   constructor() {
     super();
@@ -36,11 +35,6 @@ export default class PointsModel extends Observable {
     return this.#destinations;
   }
 
-  get isLoading() {
-    return this.#isLoading;
-  }
-
-  // ... остальные методы без изменений
   getOffersByType(type) {
     return this.#offers.find((offer) => offer.type === type) || { offers: [] };
   }
@@ -103,6 +97,10 @@ export default class PointsModel extends Observable {
 
   getTotalCost() {
     const points = this.points;
+    if (points.length === 0) {
+      return 0;
+    }
+
     return points.reduce((total, point) => {
       const pointCost = point.basePrice || 0;
       const offersForPoint = this.getOffersById(point.type, point.offers);
@@ -129,7 +127,9 @@ export default class PointsModel extends Observable {
     return this.#points.find((point) => point.id === pointId) || null;
   }
 
-  // ... методы updatePoint, addPoint, deletePoint остаются без изменений
+  /**
+   * Обновляет точку маршрута
+   */
   updatePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
@@ -146,6 +146,9 @@ export default class PointsModel extends Observable {
     this._notify(updateType, update);
   }
 
+  /**
+   * Добавляет новую точку маршрута
+   */
   addPoint(updateType, update) {
     const pointWithId = {
       ...update,
@@ -160,6 +163,9 @@ export default class PointsModel extends Observable {
     this._notify(updateType, pointWithId);
   }
 
+  /**
+   * Удаляет точку маршрута
+   */
   deletePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
