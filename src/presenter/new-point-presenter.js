@@ -1,8 +1,10 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import { UserAction, UpdateType } from '../const.js';
-import { nanoid } from 'nanoid';
 
+/**
+ * Презентер для создания новой точки маршрута
+ */
 export default class NewPointPresenter {
   #pointListContainer = null;
   #handleDataChange = null;
@@ -10,12 +12,27 @@ export default class NewPointPresenter {
   #pointsModel = null;
 
   #pointEditComponent = null;
+  #isDestroyed = false;
 
   constructor({ pointListContainer, pointsModel, onDataChange, onDestroy }) {
     this.#pointListContainer = pointListContainer;
     this.#pointsModel = pointsModel;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
+  }
+
+  /**
+   * Устанавливает контейнер для рендеринга
+   */
+  setContainer(container) {
+    this.#pointListContainer = container;
+  }
+
+  /**
+   * Проверяет, установлен ли контейнер
+   */
+  hasContainer() {
+    return this.#pointListContainer !== null;
   }
 
   init() {
@@ -30,9 +47,11 @@ export default class NewPointPresenter {
       pointsModel: this.#pointsModel,
       onFormSubmit: this.#handleFormSubmit,
       onCloseClick: this.#handleCloseClick,
-      onDeleteClick: this.#handleDeleteClick
+      onDeleteClick: this.#handleDeleteClick,
+      isNewPoint: true
     });
 
+    this.#isDestroyed = false;
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -42,10 +61,40 @@ export default class NewPointPresenter {
       return;
     }
 
+    this.#isDestroyed = true;
     this.#handleDestroy();
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+  }
+
+  setSaving() {
+    if (this.#isDestroyed || !this.#pointEditComponent) {
+      return;
+    }
+
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    if (this.#isDestroyed || !this.#pointEditComponent) {
+      return;
+    }
+
+    const resetFormState = () => {
+      if (!this.#isDestroyed && this.#pointEditComponent) {
+        this.#pointEditComponent.updateElement({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false,
+        });
+      }
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
   }
 
   #createBlankPoint() {
@@ -53,49 +102,62 @@ export default class NewPointPresenter {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Получаем первое доступное направление для значения по умолчанию
-    const defaultDestination = this.#getDefaultDestination();
+    // Берем первое доступное направление по умолчанию
+    const defaultDestination = this.#pointsModel.destinations[0];
 
     return {
-      id: nanoid(),
-      type: 'flight',
-      destination: defaultDestination ? defaultDestination.id : '',
+      id: `new-${Date.now()}`,
+      basePrice: 0,
       dateFrom: now.toISOString(),
       dateTo: tomorrow.toISOString(),
-      basePrice: 100,
+      destination: defaultDestination?.id || '',
       offers: [],
+      type: 'flight',
       isFavorite: false
     };
   }
 
-  #getDefaultDestination() {
-    if (!this.#pointsModel || !this.#pointsModel.destinations) {
-      return null;
-    }
-
-    const destinations = this.#pointsModel.destinations;
-    return destinations.length > 0 ? destinations[0] : null;
-  }
-
   #handleFormSubmit = (point) => {
-    // Преобразуем имя направления в ID перед сохранением
-    const pointWithDestinationId = this.#resolveDestinationId(point);
-
-    if (!this.#isPointValid(pointWithDestinationId)) {
-      this.#showValidationError(pointWithDestinationId);
+    // Проверяем, что презентер не уничтожен
+    if (this.#isDestroyed) {
       return;
     }
 
-    const normalizedPoint = this.#normalizePointData(pointWithDestinationId);
+    // Дополнительная валидация перед отправкой
+    if (!this.#isPointValid(point)) {
+      this.#pointEditComponent?.shake();
+      return;
+    }
 
+    this.setSaving();
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      normalizedPoint,
+      point,
     );
-
-    this.destroy();
   };
+
+  #isPointValid(point) {
+    // Проверяем обязательные поля
+    if (!point.destination || point.basePrice < 0) {
+      return false;
+    }
+
+    // Проверяем, что направление существует
+    const destination = this.#pointsModel.getDestinationsById(point.destination);
+    if (!destination) {
+      return false;
+    }
+
+    // Проверяем, что дата окончания позже даты начала
+    const dateFrom = new Date(point.dateFrom);
+    const dateTo = new Date(point.dateTo);
+    if (dateTo <= dateFrom) {
+      return false;
+    }
+
+    return true;
+  }
 
   #handleCloseClick = () => {
     this.destroy();
@@ -111,64 +173,4 @@ export default class NewPointPresenter {
       this.destroy();
     }
   };
-
-  #resolveDestinationId(point) {
-    // Если destination уже является ID, оставляем как есть
-    if (typeof point.destination === 'string' && point.destination.length > 0) {
-      if (this.#pointsModel) {
-        const destinationById = this.#pointsModel.getDestinationsById(point.destination);
-        if (destinationById) {
-          return point;
-        }
-
-        // Пробуем найти по имени
-        const destinationByName = this.#pointsModel.getDestinationsByName(point.destination);
-        if (destinationByName) {
-          return {
-            ...point,
-            destination: destinationByName.id
-          };
-        }
-      }
-    }
-
-    return point;
-  }
-
-  #isPointValid(point) {
-    const hasDestination = point.destination && point.destination.trim() !== '';
-    const hasValidDates = point.dateFrom && point.dateTo && new Date(point.dateFrom) < new Date(point.dateTo);
-    const hasValidPrice = point.basePrice !== null && point.basePrice !== undefined && point.basePrice >= 0;
-
-    return hasDestination && hasValidDates && hasValidPrice;
-  }
-
-  #showValidationError(point) {
-    const errors = [];
-
-    if (!point.destination || point.destination.trim() === '') {
-      errors.push('Please select a destination from the list');
-    }
-
-    if (!point.dateFrom || !point.dateTo) {
-      errors.push('Please set start and end dates');
-    } else if (new Date(point.dateFrom) >= new Date(point.dateTo)) {
-      errors.push('End date must be after start date');
-    }
-
-    if (point.basePrice === null || point.basePrice === undefined || point.basePrice < 0) {
-      errors.push('Please enter a valid price (≥ 0)');
-    }
-
-    alert(`Please fix the following errors:\n\n• ${errors.join('\n• ')}`);
-  }
-
-  #normalizePointData(point) {
-    return {
-      ...point,
-      basePrice: Number(point.basePrice) || 0,
-      dateFrom: new Date(point.dateFrom).toISOString(),
-      dateTo: new Date(point.dateTo).toISOString(),
-    };
-  }
 }

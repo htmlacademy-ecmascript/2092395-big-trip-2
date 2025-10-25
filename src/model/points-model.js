@@ -6,84 +6,59 @@ import { humanizePointDate } from '../utils/point.js';
 import { POINT_COUNT } from '../const.js';
 import { generateFilter } from '../mock/filter.js';
 
+/**
+ * Модель для управления точками маршрута
+ */
 export default class PointsModel extends Observable {
   #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = mockOffers;
   #destinations = mockDestinations;
+  #isLoading = false; // Изменяем на false, так как данные уже есть
 
+  constructor() {
+    super();
+    // Данные уже готовы (моки), поэтому сразу уведомляем об инициализации
+    this._notify('INIT');
+  }
+
+  /**
+   * Возвращает список всех точек маршрута
+   */
   get points() {
     return this.#points;
-  }
-
-  updatePoint(updateType, update) {
-    const index = this.#points.findIndex((point) => point.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting point');
-    }
-
-    this.#points = [
-      ...this.#points.slice(0, index),
-      update,
-      ...this.#points.slice(index + 1),
-    ];
-
-    this._notify(updateType, update);
-  }
-
-  addPoint(updateType, update) {
-    this.#points = [
-      update,
-      ...this.#points,
-    ];
-
-    this._notify(updateType, update);
-  }
-
-  deletePoint(updateType, update) {
-    const index = this.#points.findIndex((point) => point.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting point');
-    }
-
-    this.#points = [
-      ...this.#points.slice(0, index),
-      ...this.#points.slice(index + 1),
-    ];
-
-    this._notify(updateType);
   }
 
   get offers() {
     return this.#offers;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
+  get isLoading() {
+    return this.#isLoading;
+  }
+
+  // ... остальные методы без изменений
   getOffersByType(type) {
-    const allOffers = this.#offers;
-    return allOffers.find((offer) => offer.type === type);
+    return this.#offers.find((offer) => offer.type === type) || { offers: [] };
   }
 
   getOffersById(type, itemsId) {
     const offersType = this.getOffersByType(type);
-    if (!offersType || !itemsId) {
+    if (!offersType || !itemsId || !Array.isArray(itemsId)) {
       return [];
     }
     return offersType.offers.filter((item) => itemsId.includes(item.id));
   }
 
-  get destinations() {
-    return this.#destinations;
-  }
-
   getDestinationsById(id) {
-    const allDestinations = this.#destinations;
-    return allDestinations.find((item) => item.id === id) || null;
+    return this.#destinations.find((item) => item.id === id) || null;
   }
 
   getDestinationsByName(name) {
-    const allDestinations = this.#destinations;
-    return allDestinations.find((item) => item.name === name) || null;
+    return this.#destinations.find((item) => item.name === name) || null;
   }
 
   getTripTitle() {
@@ -92,9 +67,14 @@ export default class PointsModel extends Observable {
       return 'No points added yet';
     }
 
-    const destinationNames = points
+    const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+    const destinationNames = sortedPoints
       .map((point) => this.getDestinationsById(point.destination)?.name)
       .filter(Boolean);
+
+    if (destinationNames.length === 0) {
+      return 'Unknown destination';
+    }
 
     const uniqueNames = [...new Set(destinationNames)];
 
@@ -114,20 +94,80 @@ export default class PointsModel extends Observable {
     const startDate = sortedPoints[0].dateFrom;
     const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
 
+    if (!startDate || !endDate) {
+      return '';
+    }
+
     return `${humanizePointDate(startDate)} — ${humanizePointDate(endDate)}`;
   }
 
   getTotalCost() {
     const points = this.points;
     return points.reduce((total, point) => {
-      const pointCost = point.basePrice;
+      const pointCost = point.basePrice || 0;
       const offersForPoint = this.getOffersById(point.type, point.offers);
-      const offersCost = offersForPoint.reduce((sum, offer) => sum + offer.price, 0);
+      const offersCost = offersForPoint.reduce((sum, offer) => sum + (offer.price || 0), 0);
       return total + pointCost + offersCost;
     }, 0);
   }
 
   getAvailableFilters() {
     return generateFilter(this.#points);
+  }
+
+  /**
+   * Проверяет, существует ли точка с указанным ID
+   */
+  hasPoint(pointId) {
+    return this.#points.some((point) => point.id === pointId);
+  }
+
+  /**
+   * Возвращает точку по ID
+   */
+  getPointById(pointId) {
+    return this.#points.find((point) => point.id === pointId) || null;
+  }
+
+  // ... методы updatePoint, addPoint, deletePoint остаются без изменений
+  updatePoint(updateType, update) {
+    const index = this.#points.findIndex((point) => point.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting point');
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, index),
+      update,
+      ...this.#points.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
+  }
+
+  addPoint(updateType, update) {
+    const pointWithId = {
+      ...update,
+      id: crypto.randomUUID()
+    };
+
+    this.#points = [
+      pointWithId,
+      ...this.#points,
+    ];
+
+    this._notify(updateType, pointWithId);
+  }
+
+  deletePoint(updateType, update) {
+    const index = this.#points.findIndex((point) => point.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting point');
+    }
+
+    this.#points = this.#points.filter((point) => point.id !== update.id);
+    this._notify(updateType);
   }
 }

@@ -3,6 +3,9 @@ import FilterView from '../view/filter-view.js';
 import { filter } from '../utils/filter.js';
 import { FilterType, UpdateType } from '../const.js';
 
+/**
+ * Презентер для управления фильтрами
+ */
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
@@ -19,10 +22,40 @@ export default class FilterPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
+  init(container = this.#filterContainer) {
+    if (container) {
+      this.#filterContainer = container;
+    }
+
+    // Если данные еще загружаются, не рендерим фильтры
+    if (this.#pointsModel.isLoading) {
+      return;
+    }
+
+    const filters = this.filters;
+    const prevFilterComponent = this.#filterComponent;
+
+    this.#filterComponent = new FilterView({
+      filters,
+      currentFilterType: this.#filterModel.filter,
+      onFilterTypeChange: this.#handleFilterTypeChange
+    });
+
+    if (prevFilterComponent === null) {
+      render(this.#filterComponent, this.#filterContainer);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
+  }
+
+  /**
+   * Возвращает массив фильтров с актуальными данными
+   */
   get filters() {
     const points = this.#pointsModel.points;
 
-    // Создаем гарантированный массив фильтров
     return [
       {
         type: FilterType.EVERYTHING,
@@ -55,27 +88,10 @@ export default class FilterPresenter {
     ];
   }
 
-  init() {
-    const filters = this.filters;
-    const prevFilterComponent = this.#filterComponent;
-
-    this.#filterComponent = new FilterView({
-      filters,
-      currentFilterType: this.#filterModel.filter,
-      onFilterTypeChange: this.#handleFilterTypeChange
-    });
-
-    if (prevFilterComponent === null) {
-      render(this.#filterComponent, this.#filterContainer);
-      return;
+  #handleModelEvent = (updateType) => {
+    if (updateType === 'INIT') {
+      this.init();
     }
-
-    replace(this.#filterComponent, prevFilterComponent);
-    remove(prevFilterComponent);
-  }
-
-  #handleModelEvent = () => {
-    this.init();
   };
 
   #handleFilterTypeChange = (filterType) => {

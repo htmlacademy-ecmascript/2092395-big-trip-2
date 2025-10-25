@@ -10,6 +10,7 @@ export default class FilterModel extends Observable {
 
   /**
    * Возвращает текущий активный фильтр
+   * @returns {string} текущий фильтр
    */
   get filter() {
     return this.#filter;
@@ -23,5 +24,14 @@ export default class FilterModel extends Observable {
   setFilter(updateType, filter) {
     this.#filter = filter;
     this._notify(updateType, filter);
+  }
+
+  /**
+   * Сбрасывает фильтр на значение по умолчанию
+   * @param {string} updateType - тип обновления
+   */
+  resetFilter(updateType) {
+    this.#filter = FilterType.EVERYTHING;
+    this._notify(updateType, this.#filter);
   }
 }

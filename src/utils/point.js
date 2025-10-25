@@ -49,9 +49,9 @@ const sortPointsTime = (pointA, pointB) => {
   return durationB - durationA; // Сортировка по убыванию длительности
 };
 
-const sortPointsPrice = (pointA, pointB) => {
-  return pointB.basePrice - pointA.basePrice; // Сортировка по убыванию цены
-};
+const sortPointsPrice = (pointA, pointB) =>
+  pointB.basePrice - pointA.basePrice; // Сортировка по убыванию цены
+
 
 // Функции для фильтрации
 function isPointFuture(point) {

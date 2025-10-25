@@ -31,6 +31,12 @@ const DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.'];
 
+// Режимы редактирования
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 // Типы фильтров
 const FilterType = {
   EVERYTHING: 'everything',
@@ -53,11 +59,12 @@ const UserAction = {
   DELETE_POINT: 'DELETE_POINT',
 };
 
-// Типы обновлений для наблюдателей
+// Типы обновлений
 const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+  PATCH: 'PATCH', // Обновление одной точки
+  MINOR: 'MINOR', // Незначительное обновление (перерисовка списка)
+  MAJOR: 'MAJOR', // Значительное обновление (перерисовка всей доски)
+  INIT: 'INIT', // Инициализация приложения
 };
 
 // Константы для генерации данных
@@ -82,6 +89,7 @@ export {
   DATE_FORMAT,
   TIME_FORMAT,
   POINT_COUNT,
+  Mode,
   FilterType,
   SortType,
   UserAction,
