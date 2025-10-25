@@ -1,7 +1,8 @@
-// Импортируем объект с функциями фильтрации
 import { filter } from '../utils/filter.js';
 
-// Функция для генерации данных фильтров (аналогично вашему примеру с задачами)
+/**
+ * Функция для генерации данных фильтров
+ */
 function generateFilter(points) {
   // Преобразуем объект filter в массив с информацией о каждом фильтре
   return Object.entries(filter).map(
@@ -19,7 +20,9 @@ function generateFilter(points) {
   );
 }
 
-// Вспомогательная функция для получения отображаемого имени фильтра
+/**
+ * Вспомогательная функция для получения отображаемого имени фильтра
+ */
 function getFilterDisplayName(filterType) {
   const names = {
     everything: 'Everything',
