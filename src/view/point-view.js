@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizePointDate, humanizePointTime, getDifferenceInTime } from '../utils/point.js';
+import { humanizePointDay, humanizePointTime, getDifferenceInTime } from '../utils/point.js';
 import he from 'he';
 
 function createOfferTemplate({ title, price }) {
@@ -18,7 +18,7 @@ function createPointTemplate(point, offers, destination) {
 
   return `<li class="trip-events__item">
             <div class="event">
-              <time class="event__date" datetime=${dateFrom}>${humanizePointDate(dateFrom)}</time>
+              <time class="event__date" datetime=${dateFrom}>${humanizePointDay(dateFrom)}</time>
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
               </div>
@@ -66,7 +66,6 @@ export default class PointView extends AbstractView {
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
-    // Вешаем обработчик на кнопку редактирования
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#editClickHandler);
 

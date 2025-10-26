@@ -74,9 +74,11 @@ const MAX_PRICE = 1000;
 const MIN_PHOTO_INDEX = 1;
 const MAX_PHOTO_INDEX = 5;
 
-// Форматы дат и времени - ВАЖНО: правильные форматы
+// Форматы дат и времени
 const DATE_FORMAT = 'DD/MM/YY HH:mm';
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT_DAY = 'MMM D';
+const DATE_FORMAT_SHORT = 'MMM D';
 
 export {
   TYPE_OF_EVENTS,
@@ -88,6 +90,8 @@ export {
   MAX_PHOTO_INDEX,
   DATE_FORMAT,
   TIME_FORMAT,
+  DATE_FORMAT_DAY,
+  DATE_FORMAT_SHORT,
   POINT_COUNT,
   Mode,
   FilterType,

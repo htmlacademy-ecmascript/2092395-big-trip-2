@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DATE_FORMAT, TIME_FORMAT } from '../const.js';
+import { DATE_FORMAT, TIME_FORMAT, DATE_FORMAT_SHORT, DATE_FORMAT_DAY } from '../const.js';
 
 dayjs.extend(duration);
 
@@ -10,6 +10,14 @@ function humanizePointDate(date) {
 
 function humanizePointTime(date) {
   return date ? dayjs(date).format(TIME_FORMAT) : '';
+}
+
+function humanizePointDay(date) {
+  return date ? dayjs(date).format(DATE_FORMAT_DAY) : '';
+}
+
+function humanizePointMonth(date) {
+  return date ? dayjs(date).format(DATE_FORMAT_SHORT) : '';
 }
 
 function getDifferenceInTime(dateStart, dateEnd) {
@@ -69,6 +77,8 @@ function isPointPast(point) {
 export {
   humanizePointDate,
   humanizePointTime,
+  humanizePointDay,
+  humanizePointMonth,
   getDifferenceInTime,
   sortPointsDay,
   sortPointsTime,
