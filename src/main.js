@@ -5,7 +5,9 @@ import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import TripInfoPresenter from './presenter/trip-info-presenter.js';
 import NewPointButtonView from './view/add-new-point-view.js';
+import PointsApiService from './points-api-service.js';
 
+const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
 /**
  * Основной класс приложения
  */

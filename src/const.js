@@ -80,6 +80,12 @@ const TIME_FORMAT = 'HH:mm';
 const DATE_FORMAT_DAY = 'MMM D';
 const DATE_FORMAT_SHORT = 'MMM D';
 
+const Url = {
+  POINTS: 'points',
+  OFFERS: 'offers',
+  DESTINATIONS: 'destinations',
+};
+
 export {
   TYPE_OF_EVENTS,
   CITIES,
@@ -98,4 +104,5 @@ export {
   SortType,
   UserAction,
   UpdateType,
+  Url,
 };

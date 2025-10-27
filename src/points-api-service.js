@@ -1,4 +1,5 @@
 import ApiService from './framework/api-service.js';
+import {Url} from './const.js';
 
 const Method = {
   GET: 'GET',
@@ -7,13 +8,23 @@ const Method = {
 
 export default class PointsApiService extends ApiService {
   get points() {
-    return this._load({url: 'points'})
+    return this._load({url: Url.POINTS})
+      .then(ApiService.parseResponse);
+  }
+
+  get offers() {
+    return this._load({url: Url.OFFERS})
+      .then(ApiService.parseResponse);
+  }
+
+  get destinations() {
+    return this._load({url: Url.DESTINATIONS})
       .then(ApiService.parseResponse);
   }
 
   async updatePoint(point) {
     const response = await this._load({
-      url: `tasks/${point.id}`,
+      url: `points/${point.id}`,
       method: Method.PUT,
       body: JSON.stringify(point),
       headers: new Headers({'Content-Type': 'application/json'}),
