@@ -1,63 +1,58 @@
+import Observable from '../framework/observable.js';
 import { getRandomPoint } from '../mock/points.js';
 import { mockDestinations } from '../mock/destinations.js';
 import { mockOffers } from '../mock/offers.js';
-import { humanizePointDate } from '../utils/point.js';
+import { humanizePointMonth } from '../utils/point.js';
 import { POINT_COUNT } from '../const.js';
 import { generateFilter } from '../mock/filter.js';
-import { updateItem } from '../utils/common.js';
 
-// Создаем заготовку для модели
-export default class PointsModel {
-
-  // У конструктора массивов Array вызываем метод from, который позволяет из масиво-подобного объекта получить нормальный массив
-  // Вторым аргументом передаем функцию, которая будет применена к каждому элементу массива
-  // Получаем массив из 3х элементов
+/**
+ * Модель для управления точками маршрута
+ */
+export default class PointsModel extends Observable {
   #points = Array.from({length: POINT_COUNT}, getRandomPoint);
   #offers = mockOffers;
   #destinations = mockDestinations;
 
-  /* Методы для работы  точками */
-
-  get points() {
-    return this.#points;
+  constructor() {
+    super();
+    this._notify('INIT');
   }
 
-  updatePoint(updateType, update) {
-    this.#points = updateItem(this.#points, update);
+  /**
+   * Возвращает список всех точек маршрута
+   */
+  get points() {
+    return this.#points;
   }
 
   get offers() {
     return this.#offers;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
   getOffersByType(type) {
-    const allOffers = this.#offers;
-    return allOffers.find((offer) => offer.type === type);
+    return this.#offers.find((offer) => offer.type === type) || { offers: [] };
   }
 
   getOffersById(type, itemsId) {
     const offersType = this.getOffersByType(type);
-    if (!offersType || !itemsId) {
+    if (!offersType || !itemsId || !Array.isArray(itemsId)) {
       return [];
     }
     return offersType.offers.filter((item) => itemsId.includes(item.id));
   }
 
-  get destinations() {
-    return this.#destinations;
-  }
-
   getDestinationsById(id) {
-    const allDestinations = this.#destinations;
-    return allDestinations.find((item) => item.id === id) || null;
+    return this.#destinations.find((item) => item.id === id) || null;
   }
 
   getDestinationsByName(name) {
-    const allDestinations = this.#destinations;
-    return allDestinations.find((item) => item.name === name) || null;
+    return this.#destinations.find((item) => item.name === name) || null;
   }
-
-  /* Методы для вычисления данных хедера */
 
   getTripTitle() {
     const points = this.#points;
@@ -65,14 +60,17 @@ export default class PointsModel {
       return 'No points added yet';
     }
 
-    // Логика формирования заголовка маршрута
-    const destinationNames = points
+    const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+    const destinationNames = sortedPoints
       .map((point) => this.getDestinationsById(point.destination)?.name)
-      .filter(Boolean); // Убираем возможные undefined
+      .filter(Boolean);
 
-    const uniqueNames = [...new Set(destinationNames)]; // Убираем дубликаты
+    if (destinationNames.length === 0) {
+      return 'Unknown destination';
+    }
 
-    // Схема: "First — ... — Last" если точек много, или полный маршрут если мало
+    const uniqueNames = [...new Set(destinationNames)];
+
     if (uniqueNames.length > 3) {
       return `${uniqueNames[0]} — ... — ${uniqueNames[uniqueNames.length - 1]}`;
     }
@@ -85,30 +83,97 @@ export default class PointsModel {
       return '';
     }
 
-    // Логика вычисления дат поездки
     const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
     const startDate = sortedPoints[0].dateFrom;
     const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
 
-    return `${humanizePointDate(startDate)} — ${humanizePointDate(endDate)}`;
+    if (!startDate || !endDate) {
+      return '';
+    }
+
+    // Используем формат для информации о поездке
+    return `${humanizePointMonth(startDate)} — ${humanizePointMonth(endDate)}`;
   }
 
   getTotalCost() {
     const points = this.points;
-    // Логика вычисления общей стоимости: сумма цен точек + сумма выбранных офферов
+    if (points.length === 0) {
+      return 0;
+    }
+
     return points.reduce((total, point) => {
-      const pointCost = point.basePrice;
-
-      // Добавляем стоимость выбранных офферов для этой точки
+      const pointCost = point.basePrice || 0;
       const offersForPoint = this.getOffersById(point.type, point.offers);
-      const offersCost = offersForPoint.reduce((sum, offer) => sum + offer.price, 0);
-
+      const offersCost = offersForPoint.reduce((sum, offer) => sum + (offer.price || 0), 0);
       return total + pointCost + offersCost;
     }, 0);
   }
 
-  // Метод для получения информации о доступных фильтрах
   getAvailableFilters() {
     return generateFilter(this.#points);
+  }
+
+  /**
+   * Проверяет, существует ли точка с указанным ID
+   */
+  hasPoint(pointId) {
+    return this.#points.some((point) => point.id === pointId);
+  }
+
+  /**
+   * Возвращает точку по ID
+   */
+  getPointById(pointId) {
+    return this.#points.find((point) => point.id === pointId) || null;
+  }
+
+  /**
+   * Обновляет точку маршрута
+   */
+  updatePoint(updateType, update) {
+    const index = this.#points.findIndex((point) => point.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting point');
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, index),
+      update,
+      ...this.#points.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
+  }
+
+  /**
+   * Добавляет новую точку маршрута
+   */
+  addPoint(updateType, update) {
+    const pointWithId = {
+      ...update,
+      id: crypto.randomUUID()
+    };
+
+    this.#points = [
+      pointWithId,
+      ...this.#points,
+    ];
+
+    this._notify(updateType, pointWithId);
+  }
+
+  /**
+   * Удаляет точку маршрута
+   */
+  deletePoint(updateType, update) {
+    const index = this.#points.findIndex((point) => point.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting point');
+    }
+
+    this.#points = this.#points.filter((point) => point.id !== update.id);
+    this._notify(updateType);
   }
 }

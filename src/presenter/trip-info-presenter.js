@@ -1,10 +1,10 @@
-import { render, RenderPosition } from '../framework/render.js';
-import InfoTripView from '../view/info-trip-view.js';
+import { render, RenderPosition, remove } from '../framework/render.js';
+import TripInfoView from '../view/trip-info-view.js';
 
 export default class TripInfoPresenter {
   #container = null;
   #pointsModel = null;
-  #infoComponent = null;
+  #tripInfoComponent = null;
 
   constructor({ container, pointsModel }) {
     this.#container = container;
@@ -12,19 +12,35 @@ export default class TripInfoPresenter {
   }
 
   init() {
+    this.#renderTripInfo();
+  }
+
+  /**
+   * Обновляет информацию о поездке
+   */
+  update() {
+    this.#renderTripInfo();
+  }
+
+  #renderTripInfo() {
+    // Удаляем предыдущий компонент, если он есть
+    if (this.#tripInfoComponent) {
+      remove(this.#tripInfoComponent);
+    }
+
     // Используем методы модели для получения данных
     const tripTitle = this.#pointsModel.getTripTitle();
     const tripDateRange = this.#pointsModel.getTripDateRange();
     const totalCost = this.#pointsModel.getTotalCost();
 
     // Создаем экземпляр View, передавая в него данные
-    this.#infoComponent = new InfoTripView({
-      title: tripTitle,
-      dateRange: tripDateRange,
-      totalCost: totalCost
+    this.#tripInfoComponent = new TripInfoView({
+      tripTitle,
+      tripDateRange,
+      totalCost
     });
 
     // Рендерим компонент в переданный контейнер
-    render(this.#infoComponent, this.#container, RenderPosition.AFTERBEGIN);
+    render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 }

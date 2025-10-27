@@ -1,3 +1,4 @@
+// Типы событий
 const TYPE_OF_EVENTS = [
   'taxi',
   'bus',
@@ -10,12 +11,14 @@ const TYPE_OF_EVENTS = [
   'restaurant'
 ];
 
+// Города для точек маршрута
 const CITIES = [
   'Amsterdam',
   'Chamonix',
   'Geneva'
 ];
 
+// Описания для направлений
 const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -28,6 +31,13 @@ const DESCRIPTIONS = [
   'Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.'];
 
+// Режимы редактирования
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+// Типы фильтров
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -35,22 +45,40 @@ const FilterType = {
   PAST: 'past'
 };
 
-const POINT_COUNT = 4;
-
-const MIN_PRICE = 1;
-const MAX_PRICE = 1000;
-
-const MIN_PHOTO_INDEX = 1;
-const MAX_PHOTO_INDEX = 5;
-
-const DATE_FORMAT = 'MMMM D';
-const TIME_FORMAT = 'HH:mm';
-
+// Типы сортировки
 const SortType = {
   DAY: 'day',
   TIME: 'time',
   PRICE: 'price',
 };
+
+// Действия пользователя
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+// Типы обновлений
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+// Константы для генерации данных
+const POINT_COUNT = 4;
+const MIN_PRICE = 1;
+const MAX_PRICE = 1000;
+const MIN_PHOTO_INDEX = 1;
+const MAX_PHOTO_INDEX = 5;
+
+// Форматы дат и времени
+const DATE_FORMAT = 'DD/MM/YY HH:mm';
+const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT_DAY = 'MMM D';
+const DATE_FORMAT_SHORT = 'MMM D';
 
 export {
   TYPE_OF_EVENTS,
@@ -62,7 +90,12 @@ export {
   MAX_PHOTO_INDEX,
   DATE_FORMAT,
   TIME_FORMAT,
+  DATE_FORMAT_DAY,
+  DATE_FORMAT_SHORT,
   POINT_COUNT,
+  Mode,
   FilterType,
   SortType,
+  UserAction,
+  UpdateType,
 };
