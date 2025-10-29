@@ -7,7 +7,10 @@ import TripInfoPresenter from './presenter/trip-info-presenter.js';
 import NewPointButtonView from './view/add-new-point-view.js';
 import PointsApiService from './points-api-service.js';
 
+
+const AUTHORIZATION = 'Basic er989jdzbVv';
 const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
+
 /**
  * Основной класс приложения
  */
@@ -18,9 +21,13 @@ class App {
   #filterPresenter = null;
   #tripInfoPresenter = null;
   #newPointButtonComponent = null;
+  #pointsApiService = null;
 
   constructor() {
-    this.#pointsModel = new PointsModel();
+    this.#pointsApiService = new PointsApiService(END_POINT, AUTHORIZATION);
+    this.#pointsModel = new PointsModel({
+      pointsApiService: this.#pointsApiService
+    });
     this.#filterModel = new FilterModel();
 
     // Подписываемся на изменения точек маршрута
@@ -75,7 +82,7 @@ class App {
       existingButton.remove();
     }
 
-    // Рендерим нашу кнопку "New Event"
+    // Рендерим кнопку "New Event"
     render(this.#newPointButtonComponent, siteHeaderMainElement);
 
     // Инициализируем презентеры
