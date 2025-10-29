@@ -1,11 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
 import FilterView from '../view/filter-view.js';
-import { filter } from '../utils/filter.js';
+import { isPointFuture, isPointPresent, isPointPast } from '../utils/point.js';
 import { FilterType, UpdateType } from '../const.js';
 
-/**
- * Презентер для управления фильтрами
- */
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
@@ -27,7 +24,6 @@ export default class FilterPresenter {
       this.#filterContainer = container;
     }
 
-    // Если данные еще загружаются, не рендерим фильтры
     if (this.#pointsModel.isLoading) {
       return;
     }
@@ -50,9 +46,6 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   }
 
-  /**
-   * Возвращает массив фильтров с актуальными данными
-   */
   get filters() {
     const points = this.#pointsModel.points;
 
@@ -60,29 +53,29 @@ export default class FilterPresenter {
       {
         type: FilterType.EVERYTHING,
         name: 'Everything',
-        count: filter[FilterType.EVERYTHING](points).length,
-        isDisabled: filter[FilterType.EVERYTHING](points).length === 0,
+        count: points.length,
+        isDisabled: points.length === 0,
         isChecked: this.#filterModel.filter === FilterType.EVERYTHING
       },
       {
         type: FilterType.FUTURE,
         name: 'Future',
-        count: filter[FilterType.FUTURE](points).length,
-        isDisabled: filter[FilterType.FUTURE](points).length === 0,
+        count: points.filter((point) => isPointFuture(point)).length,
+        isDisabled: points.filter((point) => isPointFuture(point)).length === 0,
         isChecked: this.#filterModel.filter === FilterType.FUTURE
       },
       {
         type: FilterType.PRESENT,
         name: 'Present',
-        count: filter[FilterType.PRESENT](points).length,
-        isDisabled: filter[FilterType.PRESENT](points).length === 0,
+        count: points.filter((point) => isPointPresent(point)).length,
+        isDisabled: points.filter((point) => isPointPresent(point)).length === 0,
         isChecked: this.#filterModel.filter === FilterType.PRESENT
       },
       {
         type: FilterType.PAST,
         name: 'Past',
-        count: filter[FilterType.PAST](points).length,
-        isDisabled: filter[FilterType.PAST](points).length === 0,
+        count: points.filter((point) => isPointPast(point)).length,
+        isDisabled: points.filter((point) => isPointPast(point)).length === 0,
         isChecked: this.#filterModel.filter === FilterType.PAST
       }
     ];

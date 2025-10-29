@@ -6,7 +6,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import TripInfoPresenter from './presenter/trip-info-presenter.js';
 import NewPointButtonView from './view/add-new-point-view.js';
 import PointsApiService from './points-api-service.js';
-
+import LoadingView from './view/loading-view.js';
 
 const AUTHORIZATION = 'Basic er989jdzbVv';
 const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
@@ -22,6 +22,7 @@ class App {
   #tripInfoPresenter = null;
   #newPointButtonComponent = null;
   #pointsApiService = null;
+  #loadingComponent = new LoadingView();
 
   constructor() {
     this.#pointsApiService = new PointsApiService(END_POINT, AUTHORIZATION);
@@ -30,15 +31,16 @@ class App {
     });
     this.#filterModel = new FilterModel();
 
-    // Подписываемся на изменения точек маршрута
     this.#pointsModel.addObserver(this.#handleModelEvent.bind(this));
   }
 
-  /**
-   * Инициализирует приложение
-   */
-  init() {
+  async init() {
     this.#initComponents();
+    this.#showLoading();
+
+    await this.#pointsModel.init();
+
+    this.#hideLoading();
     this.#renderComponents();
   }
 
@@ -48,12 +50,10 @@ class App {
     const siteHeaderFilters = siteHeader.querySelector('.trip-controls__filters');
     const siteMainElement = document.querySelector('.page-main .trip-events');
 
-    // Создаем кнопку "New Event"
     this.#newPointButtonComponent = new NewPointButtonView({
       onClick: this.#handleNewPointButtonClick.bind(this)
     });
 
-    // Создаем презентеры
     this.#filterPresenter = new FilterPresenter({
       filterContainer: siteHeaderFilters,
       filterModel: this.#filterModel,
@@ -73,26 +73,31 @@ class App {
     });
   }
 
+  #showLoading() {
+    const siteMainElement = document.querySelector('.page-main .trip-events');
+    render(this.#loadingComponent, siteMainElement);
+  }
+
+  #hideLoading() {
+    this.#loadingComponent.removeElement();
+  }
+
   #renderComponents() {
     const siteHeaderMainElement = document.querySelector('.trip-main');
 
-    // Удаляем существующую кнопку если есть
     const existingButton = siteHeaderMainElement.querySelector('.trip-main__event-add-btn');
     if (existingButton) {
       existingButton.remove();
     }
 
-    // Рендерим кнопку "New Event"
     render(this.#newPointButtonComponent, siteHeaderMainElement);
 
-    // Инициализируем презентеры
     this.#filterPresenter.init();
     this.#boardPresenter.init();
     this.#tripInfoPresenter.init();
   }
 
   #handleModelEvent = (updateType) => {
-    // Обновляем информацию о поездке при любых изменениях точек
     if (updateType === 'MINOR' || updateType === 'MAJOR' || updateType === 'PATCH') {
       this.#tripInfoPresenter.update();
     }
@@ -108,6 +113,5 @@ class App {
   }
 }
 
-// Запускаем приложение
 const app = new App();
 app.init();

@@ -8,9 +8,6 @@ import { sortPointsDay, sortPointsTime, sortPointsPrice } from '../utils/point.j
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 
-/**
- * Презентер для управления доской с точками маршрута
- */
 export default class BoardPresenter {
   #boardContainer = null;
   #pointsModel = null;
@@ -41,16 +38,10 @@ export default class BoardPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  /**
-   * Инициализация презентера
-   */
   init() {
     this.#renderBoard();
   }
 
-  /**
-   * Возвращает отфильтрованные и отсортированные точки маршрута
-   */
   get points() {
     this.#filterType = this.#filterModel.filter;
     const points = this.#pointsModel.points;
@@ -74,14 +65,10 @@ export default class BoardPresenter {
     return sortedPoints;
   }
 
-  /**
-   * Создает новую точку маршрута
-   */
   createPoint() {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
 
-    // Устанавливаем контейнер для newPointPresenter если его нет
     if (this.#boardComponent && !this.#newPointPresenter.hasContainer()) {
       this.#newPointPresenter.setContainer(this.#boardComponent.element);
     }
@@ -111,21 +98,17 @@ export default class BoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        // Обновляем только конкретную точку
         this.#pointPresenters.get(data.id)?.init(data);
         break;
       case UpdateType.MINOR:
-        // Перерисовываем доску
         this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        // Полная перерисовка
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
       case UpdateType.INIT:
-        // Инициализация - перерисовываем доску
         this.#clearBoard();
         this.#renderBoard();
         break;
@@ -205,14 +188,11 @@ export default class BoardPresenter {
   }
 
   #renderBoard() {
-    // Очищаем контейнер
     this.#boardContainer.innerHTML = '';
 
-    // Создаем компонент списка событий
     this.#boardComponent = new EventListView();
     render(this.#boardComponent, this.#boardContainer);
 
-    // Устанавливаем контейнер для newPointPresenter
     this.#newPointPresenter.setContainer(this.#boardComponent.element);
 
     const points = this.points;
