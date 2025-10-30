@@ -170,6 +170,7 @@ export default class BoardPresenter {
       onSortTypeChange: this.#handleSortTypeChange
     });
 
+    // Рендерим сортировку ПЕРЕД списком точек
     render(this.#sortComponent, this.#boardContainer);
   }
 
@@ -242,11 +243,6 @@ export default class BoardPresenter {
       return;
     }
 
-    this.#boardComponent = new EventListView();
-    render(this.#boardComponent, this.#boardContainer);
-
-    this.#newPointPresenter.setContainer(this.#boardComponent.element);
-
     const points = this.points;
 
     if (points.length === 0) {
@@ -254,7 +250,17 @@ export default class BoardPresenter {
       return;
     }
 
+    // Сначала рендерим сортировку
     this.#renderSort();
+
+    // Затем создаем и рендерим контейнер для списка точек
+    this.#boardComponent = new EventListView();
+    render(this.#boardComponent, this.#boardContainer);
+
+    // Устанавливаем контейнер для новой точки
+    this.#newPointPresenter.setContainer(this.#boardComponent.element);
+
+    // И только потом рендерим точки
     this.#renderPoints();
   }
 
