@@ -1,9 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { TYPE_OF_EVENTS } from '../const.js';
+import { TYPE_OF_EVENTS, PriceLimit } from '../const.js';
 import { humanizePointDate, humanizePointTime } from '../utils/point.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
+
 
 /**
  * Создает шаблон для типа события
@@ -358,27 +359,29 @@ export default class EditPointView extends AbstractStatefulView {
   #setDatepicker() {
     const [dateFromElement, dateToElement] = this.element.querySelectorAll('.event__input--time');
 
+    const commonConfig = {
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      'time_24hr': true,
+    };
+
     this.#datepickerStart = flatpickr(
       dateFromElement,
       {
-        dateFormat: 'd/m/y H:i',
+        ...commonConfig,
         defaultDate: this._state.dateFrom,
         maxDate: this._state.dateTo,
         onChange: this.#dateFromChangeHandler,
-        enableTime: true,
-        'time_24hr': true,
       }
     );
 
     this.#datepickerEnd = flatpickr(
       dateToElement,
       {
-        dateFormat: 'd/m/y H:i',
+        ...commonConfig,
         defaultDate: this._state.dateTo,
         minDate: this._state.dateFrom,
         onChange: this.#dateToChangeHandler,
-        enableTime: true,
-        'time_24hr': true,
       }
     );
   }
@@ -405,8 +408,17 @@ export default class EditPointView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
+    const price = parseInt(evt.target.value, 10);
+
+    if (isNaN(price) || price < PriceLimit.MIN || price > PriceLimit.MAX) {
+      evt.target.setCustomValidity(`Price must be between ${PriceLimit.MIN} and ${PriceLimit.MAX}`);
+      evt.target.reportValidity();
+      return;
+    }
+
+    evt.target.setCustomValidity('');
     this._setState({
-      basePrice: parseInt(evt.target.value, 10)
+      basePrice: price
     });
   };
 
@@ -468,6 +480,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #isFormValid() {
     const destinationInput = this.element.querySelector('.event__input--destination');
+    const priceInput = this.element.querySelector('.event__input--price');
     const destinationName = destinationInput.value;
     const destination = this.#pointsModel.getDestinationsByName(destinationName);
 
@@ -476,9 +489,24 @@ export default class EditPointView extends AbstractStatefulView {
       destinationInput.reportValidity();
       return false;
     }
-
     destinationInput.setCustomValidity('');
-    return true;
+
+    const price = parseInt(priceInput.value, 10);
+    if (isNaN(price) || price < PriceLimit.MIN || price > PriceLimit.MAX) {
+      priceInput.setCustomValidity(`Price must be between ${PriceLimit.MIN} and ${PriceLimit.MAX}`);
+      priceInput.reportValidity();
+      return false;
+    }
+    priceInput.setCustomValidity('');
+
+    if (!this._state.dateFrom || !this._state.dateTo) {
+      return false;
+    }
+
+    const dateFrom = new Date(this._state.dateFrom);
+    const dateTo = new Date(this._state.dateTo);
+
+    return dateTo > dateFrom;
   }
 
   static parsePointToState(point) {

@@ -1,11 +1,12 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
-import { UserAction, UpdateType, Mode } from '../const.js';
+import { UserAction, UpdateType, Mode, PriceLimit } from '../const.js';
+
 
 export default class PointPresenter {
   #point = null;
-  #offers = null;
+  #offers = [];
   #destination = null;
   #allOffers = null;
   #pointsModel = null;
@@ -18,6 +19,18 @@ export default class PointPresenter {
   #isDestroyed = false;
 
   constructor({ point, offers, destination, allOffers, pointsModel, container, onDataChange, onModeChange }) {
+    if (!point || !point.id) {
+      throw new Error('PointPresenter: point is required and must have id');
+    }
+
+    if (!destination) {
+      throw new Error(`PointPresenter: destination not found for point ${point.id}`);
+    }
+
+    if (!Array.isArray(offers)) {
+      offers = [];
+    }
+
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
@@ -29,7 +42,11 @@ export default class PointPresenter {
   }
 
   init(point = this.#point) {
-    // Проверяем, что точка все еще существует в модели
+    if (!point || !point.id) {
+      this.destroy();
+      return;
+    }
+
     if (!this.#pointsModel.hasPoint(point.id)) {
       this.destroy();
       return;
@@ -38,44 +55,60 @@ export default class PointPresenter {
     this.#point = point;
     this.#isDestroyed = false;
 
-    this.#offers = [...this.#pointsModel.getOffersById(this.#point.type, this.#point.offers)];
-    this.#destination = this.#pointsModel.getDestinationsById(this.#point.destination);
+    try {
+      this.#offers = [...(this.#pointsModel.getOffersById(this.#point.type, this.#point.offers) || [])];
+      this.#destination = this.#pointsModel.getDestinationsById(this.#point.destination);
+
+      if (!this.#destination) {
+        this.destroy();
+        return;
+      }
+    } catch (error) {
+      this.destroy();
+      return;
+    }
 
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
-    this.#pointComponent = new PointView({
-      point: this.#point,
-      offers: this.#offers,
-      destination: this.#destination,
-      onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick
-    });
+    try {
+      this.#pointComponent = new PointView({
+        point: this.#point,
+        offers: this.#offers,
+        destination: this.#destination,
+        onEditClick: this.#handleEditClick,
+        onFavoriteClick: this.#handleFavoriteClick
+      });
 
-    this.#editPointComponent = new EditPointView({
-      point: this.#point,
-      pointsModel: this.#pointsModel,
-      onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#handleCloseClick,
-      onDeleteClick: this.#handleDeleteClick
-    });
+      this.#editPointComponent = new EditPointView({
+        point: this.#point,
+        pointsModel: this.#pointsModel,
+        onFormSubmit: this.#handleFormSubmit,
+        onCloseClick: this.#handleCloseClick,
+        onDeleteClick: this.#handleDeleteClick
+      });
 
-    if (prevPointComponent === null && prevEditPointComponent === null) {
-      render(this.#pointComponent, this.#container);
-      return;
+      if (prevPointComponent === null && prevEditPointComponent === null) {
+        render(this.#pointComponent, this.#container);
+        return;
+      }
+
+      if (this.#mode === Mode.DEFAULT) {
+        replace(this.#pointComponent, prevPointComponent);
+      }
+
+      if (this.#mode === Mode.EDITING) {
+        replace(this.#pointComponent, prevEditPointComponent);
+        this.#mode = Mode.DEFAULT;
+      }
+
+      remove(prevPointComponent);
+      remove(prevEditPointComponent);
+
+    } catch (error) {
+      this.#pointComponent = null;
+      this.#editPointComponent = null;
     }
-
-    if (this.#mode === Mode.DEFAULT) {
-      replace(this.#pointComponent, prevPointComponent);
-    }
-
-    if (this.#mode === Mode.EDITING) {
-      replace(this.#editPointComponent, prevEditPointComponent);
-      this.#mode = Mode.DEFAULT;
-    }
-
-    remove(prevPointComponent);
-    remove(prevEditPointComponent);
   }
 
   destroy() {
@@ -86,8 +119,6 @@ export default class PointPresenter {
     this.#isDestroyed = true;
     remove(this.#pointComponent);
     remove(this.#editPointComponent);
-
-    // Очищаем ссылки для сборки мусора
     this.#pointComponent = null;
     this.#editPointComponent = null;
   }
@@ -97,7 +128,9 @@ export default class PointPresenter {
       return;
     }
 
-    this.#editPointComponent.reset(this.#point);
+    if (this.#editPointComponent) {
+      this.#editPointComponent.reset(this.#point);
+    }
     this.#replaceFormToPoint();
   }
 
@@ -139,14 +172,18 @@ export default class PointPresenter {
     };
 
     if (this.#mode === Mode.DEFAULT) {
-      this.#pointComponent.shake(resetFormState);
+      if (this.#pointComponent) {
+        this.#pointComponent.shake(resetFormState);
+      }
     } else {
-      this.#editPointComponent.shake(resetFormState);
+      if (this.#editPointComponent) {
+        this.#editPointComponent.shake(resetFormState);
+      }
     }
   }
 
   #replacePointToForm = () => {
-    if (this.#isDestroyed) {
+    if (this.#isDestroyed || !this.#editPointComponent || !this.#pointComponent) {
       return;
     }
 
@@ -157,7 +194,7 @@ export default class PointPresenter {
   };
 
   #replaceFormToPoint = () => {
-    if (this.#isDestroyed) {
+    if (this.#isDestroyed || !this.#pointComponent || !this.#editPointComponent) {
       return;
     }
 
@@ -180,7 +217,7 @@ export default class PointPresenter {
 
     this.#onDataChange(
       UserAction.UPDATE_POINT,
-      UpdateType.PATCH, // Используем PATCH для избранного
+      UpdateType.PATCH,
       { ...this.#point, isFavorite: !this.#point.isFavorite },
     );
   };
@@ -216,9 +253,11 @@ export default class PointPresenter {
       return;
     }
 
-    // Валидация данных перед отправкой
-    if (!this.#isPointValid(updatedPoint)) {
-      this.#editPointComponent.shake();
+    // Вызываем валидацию из формы
+    if (!this.#editPointComponent || !this.#isPointValid(updatedPoint)) {
+      if (this.#editPointComponent) {
+        this.#editPointComponent.shake();
+      }
       return;
     }
 
@@ -229,9 +268,15 @@ export default class PointPresenter {
     );
   };
 
+
   #isPointValid(point) {
-    // Базовая валидация данных точки
-    if (!point.destination || point.basePrice < 0) {
+    // Проверяем обязательные поля
+    if (!point.destination) {
+      return false;
+    }
+
+    // Проверяем цену
+    if (point.basePrice < PriceLimit.MIN || point.basePrice > PriceLimit.MAX) {
       return false;
     }
 
@@ -248,10 +293,7 @@ export default class PointPresenter {
 
     const dateFrom = new Date(point.dateFrom);
     const dateTo = new Date(point.dateTo);
-    if (dateTo <= dateFrom) {
-      return false;
-    }
 
-    return true;
+    return dateTo > dateFrom;
   }
 }

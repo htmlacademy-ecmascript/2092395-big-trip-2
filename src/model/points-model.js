@@ -1,5 +1,4 @@
 import Observable from '../framework/observable.js';
-import { humanizePointMonth } from '../utils/point.js';
 import { UpdateType } from '../const.js';
 
 export default class PointsModel extends Observable {
@@ -9,7 +8,7 @@ export default class PointsModel extends Observable {
   #destinations = [];
   #isLoading = true;
 
-  constructor({pointsApiService}) {
+  constructor({ pointsApiService }) {
     super();
     this.#pointsApiService = pointsApiService;
   }
@@ -32,6 +31,7 @@ export default class PointsModel extends Observable {
       this.#points = [];
       this.#offers = [];
       this.#destinations = [];
+      this._notify(UpdateType.ERROR);
     } finally {
       this.#isLoading = false;
       this._notify(UpdateType.INIT);
@@ -55,22 +55,36 @@ export default class PointsModel extends Observable {
   }
 
   getOffersByType(type) {
+    if (!type) {
+      return { offers: [] };
+    }
     return this.#offers.find((offer) => offer.type === type) || { offers: [] };
   }
 
   getOffersById(type, itemsId) {
-    const offersType = this.getOffersByType(type);
-    if (!offersType || !itemsId || !Array.isArray(itemsId)) {
+    if (!type || !itemsId || !Array.isArray(itemsId)) {
       return [];
     }
+
+    const offersType = this.getOffersByType(type);
+    if (!offersType || !offersType.offers) {
+      return [];
+    }
+
     return offersType.offers.filter((item) => itemsId.includes(item.id));
   }
 
   getDestinationsById(id) {
+    if (!id) {
+      return null;
+    }
     return this.#destinations.find((item) => item.id === id) || null;
   }
 
   getDestinationsByName(name) {
+    if (!name) {
+      return null;
+    }
     return this.#destinations.find((item) => item.name === name) || null;
   }
 
@@ -111,7 +125,10 @@ export default class PointsModel extends Observable {
       return '';
     }
 
-    return `${humanizePointMonth(startDate)} — ${humanizePointMonth(endDate)}`;
+    const startFormatted = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endFormatted = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    return `${startFormatted} — ${endFormatted}`;
   }
 
   getTotalCost() {
@@ -129,10 +146,16 @@ export default class PointsModel extends Observable {
   }
 
   hasPoint(pointId) {
+    if (!pointId) {
+      return false;
+    }
     return this.#points.some((point) => point.id === pointId);
   }
 
   getPointById(pointId) {
+    if (!pointId) {
+      return null;
+    }
     return this.#points.find((point) => point.id === pointId) || null;
   }
 
@@ -195,8 +218,8 @@ export default class PointsModel extends Observable {
     const adaptedPoint = {
       ...point,
       basePrice: point['base_price'],
-      dateFrom: point['date_from'],
-      dateTo: point['date_to'],
+      dateFrom: point['date_from'] ? new Date(point['date_from']).toISOString() : null,
+      dateTo: point['date_to'] ? new Date(point['date_to']).toISOString() : null,
       isFavorite: point['is_favorite']
     };
 

@@ -68,9 +68,6 @@ const UpdateType = {
 };
 
 // Константы для генерации данных
-const POINT_COUNT = 4;
-const MIN_PRICE = 1;
-const MAX_PRICE = 1000;
 const MIN_PHOTO_INDEX = 1;
 const MAX_PHOTO_INDEX = 5;
 
@@ -80,22 +77,31 @@ const TIME_FORMAT = 'HH:mm';
 const DATE_FORMAT_DAY = 'MMM D';
 const DATE_FORMAT_SHORT = 'MMM D';
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+const PriceLimit = {
+  MIN: 1,
+  MAX: 100000
+};
+
 export {
   TYPE_OF_EVENTS,
   CITIES,
   DESCRIPTIONS,
-  MIN_PRICE,
-  MAX_PRICE,
   MIN_PHOTO_INDEX,
   MAX_PHOTO_INDEX,
   DATE_FORMAT,
   TIME_FORMAT,
   DATE_FORMAT_DAY,
   DATE_FORMAT_SHORT,
-  POINT_COUNT,
   Mode,
   FilterType,
   SortType,
   UserAction,
   UpdateType,
+  TimeLimit,
+  PriceLimit,
 };

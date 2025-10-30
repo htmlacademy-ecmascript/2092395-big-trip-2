@@ -56,17 +56,20 @@ export default class PointsApiService extends ApiService {
 
   #adaptToServer(point) {
     const adaptedPoint = {
-      ...point,
-      'base_price': parseInt(point.basePrice, 10),
+      'base_price': Number(point.basePrice),
       'date_from': new Date(point.dateFrom).toISOString(),
       'date_to': new Date(point.dateTo).toISOString(),
+      'destination': point.destination,
+      'id': point.id,
       'is_favorite': Boolean(point.isFavorite),
+      'offers': point.offers || [],
+      'type': point.type
     };
 
-    delete adaptedPoint.basePrice;
-    delete adaptedPoint.dateFrom;
-    delete adaptedPoint.dateTo;
-    delete adaptedPoint.isFavorite;
+    // Удаляем временный ID для новых точек
+    if (point.id && point.id.startsWith('new-')) {
+      delete adaptedPoint.id;
+    }
 
     return adaptedPoint;
   }
