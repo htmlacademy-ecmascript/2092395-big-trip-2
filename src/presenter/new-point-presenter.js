@@ -1,6 +1,6 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
-import { UserAction, UpdateType } from '../const.js';
+import { UserAction, UpdateType, TYPE_OF_EVENTS, startPrice, PriceLimit } from '../const.js';
 
 /**
  * Презентер для создания новой точки маршрута
@@ -104,15 +104,16 @@ export default class NewPointPresenter {
 
     // Берем первое доступное направление по умолчанию
     const defaultDestination = this.#pointsModel.destinations[0];
+    const defaultType = TYPE_OF_EVENTS[0];
 
     return {
       id: `new-${Date.now()}`,
-      basePrice: 0,
+      basePrice: startPrice,
       dateFrom: now.toISOString(),
       dateTo: tomorrow.toISOString(),
       destination: defaultDestination?.id || '',
       offers: [],
-      type: 'flight',
+      type: defaultType,
       isFavorite: false
     };
   }
@@ -129,23 +130,39 @@ export default class NewPointPresenter {
       return;
     }
 
+    // Для новой точки удаляем временный ID
+    const pointToSend = { ...point };
+    if (pointToSend.id && pointToSend.id.startsWith('new-')) {
+      delete pointToSend.id;
+    }
+
     this.setSaving();
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      point,
+      pointToSend,
     );
   };
 
   #isPointValid(point) {
     // Проверяем обязательные поля
-    if (!point.destination || point.basePrice < 0) {
+    if (!point.destination) {
+      return false;
+    }
+
+    // Проверяем цену
+    if (point.basePrice < PriceLimit.MIN || point.basePrice > PriceLimit.MAX) {
       return false;
     }
 
     // Проверяем, что направление существует
     const destination = this.#pointsModel.getDestinationsById(point.destination);
     if (!destination) {
+      return false;
+    }
+
+    // Проверяем, что тип события валиден
+    if (!TYPE_OF_EVENTS.includes(point.type)) {
       return false;
     }
 
