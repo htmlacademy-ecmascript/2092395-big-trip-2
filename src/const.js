@@ -1,11 +1,11 @@
 // Типы событий
 const TYPE_OF_EVENTS = [
+  'flight',
   'taxi',
   'bus',
   'train',
   'ship',
   'drive',
-  'flight',
   'check-in',
   'sightseeing',
   'restaurant'
@@ -81,6 +81,7 @@ const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
+const startPrice = 0;
 
 const PriceLimit = {
   MIN: 1,
@@ -103,5 +104,6 @@ export {
   UserAction,
   UpdateType,
   TimeLimit,
+  startPrice,
   PriceLimit,
 };

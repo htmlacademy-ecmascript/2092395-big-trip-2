@@ -1,6 +1,6 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
-import { UserAction, UpdateType, TYPE_OF_EVENTS, PriceLimit } from '../const.js';
+import { UserAction, UpdateType, TYPE_OF_EVENTS, startPrice, PriceLimit } from '../const.js';
 
 /**
  * Презентер для создания новой точки маршрута
@@ -104,11 +104,11 @@ export default class NewPointPresenter {
 
     // Берем первое доступное направление по умолчанию
     const defaultDestination = this.#pointsModel.destinations[0];
-    const defaultType = TYPE_OF_EVENTS[0]; // 'taxi'
+    const defaultType = TYPE_OF_EVENTS[0];
 
     return {
       id: `new-${Date.now()}`,
-      basePrice: 0, // Начальная цена 100 вместо 0
+      basePrice: startPrice,
       dateFrom: now.toISOString(),
       dateTo: tomorrow.toISOString(),
       destination: defaultDestination?.id || '',
