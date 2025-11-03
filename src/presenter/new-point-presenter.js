@@ -1,38 +1,21 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
-import EditPointView from '../view/edit-point-view.js';
-import { UserAction, UpdateType, TYPE_OF_EVENTS, startPrice, PriceLimit } from '../const.js';
+import AddPointView from '../view/add-point-view';
+import { UserAction, UpdateType } from '../const.js';
 
-/**
- * Презентер для создания новой точки маршрута
- */
 export default class NewPointPresenter {
-  #pointListContainer = null;
+  #pointEditComponent = null;
+  #tripListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
-  #pointsModel = null;
+  #destinations = null;
+  #offers = null;
 
-  #pointEditComponent = null;
-  #isDestroyed = false;
-
-  constructor({ pointListContainer, pointsModel, onDataChange, onDestroy }) {
-    this.#pointListContainer = pointListContainer;
-    this.#pointsModel = pointsModel;
+  constructor({tripListContainer, onDataChange, handleDestroy, destinations, offers}) {
+    this.#tripListContainer = tripListContainer;
     this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
-  }
-
-  /**
-   * Устанавливает контейнер для рендеринга
-   */
-  setContainer(container) {
-    this.#pointListContainer = container;
-  }
-
-  /**
-   * Проверяет, установлен ли контейнер
-   */
-  hasContainer() {
-    return this.#pointListContainer !== null;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#handleDestroy = handleDestroy;
   }
 
   init() {
@@ -40,19 +23,15 @@ export default class NewPointPresenter {
       return;
     }
 
-    const blankPoint = this.#createBlankPoint();
-
-    this.#pointEditComponent = new EditPointView({
-      point: blankPoint,
-      pointsModel: this.#pointsModel,
+    this.#pointEditComponent = new AddPointView({
+      destinations: this.#destinations,
+      offers: this.#offers,
       onFormSubmit: this.#handleFormSubmit,
-      onCloseClick: this.#handleCloseClick,
       onDeleteClick: this.#handleDeleteClick,
-      isNewPoint: true
+      isNewPoint: true,
     });
 
-    this.#isDestroyed = false;
-    render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
+    render(this.#pointEditComponent, this.#tripListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
@@ -61,7 +40,6 @@ export default class NewPointPresenter {
       return;
     }
 
-    this.#isDestroyed = true;
     this.#handleDestroy();
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
@@ -69,10 +47,6 @@ export default class NewPointPresenter {
   }
 
   setSaving() {
-    if (this.#isDestroyed || !this.#pointEditComponent) {
-      return;
-    }
-
     this.#pointEditComponent.updateElement({
       isDisabled: true,
       isSaving: true,
@@ -80,104 +54,22 @@ export default class NewPointPresenter {
   }
 
   setAborting() {
-    if (this.#isDestroyed || !this.#pointEditComponent) {
-      return;
-    }
-
     const resetFormState = () => {
-      if (!this.#isDestroyed && this.#pointEditComponent) {
-        this.#pointEditComponent.updateElement({
-          isDisabled: false,
-          isSaving: false,
-          isDeleting: false,
-        });
-      }
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
     };
-
     this.#pointEditComponent.shake(resetFormState);
   }
 
-  #createBlankPoint() {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    // Берем первое доступное направление по умолчанию
-    const defaultDestination = this.#pointsModel.destinations[0];
-    const defaultType = TYPE_OF_EVENTS[0];
-
-    return {
-      id: `new-${Date.now()}`,
-      basePrice: startPrice,
-      dateFrom: now.toISOString(),
-      dateTo: tomorrow.toISOString(),
-      destination: defaultDestination?.id || '',
-      offers: [],
-      type: defaultType,
-      isFavorite: false
-    };
-  }
-
   #handleFormSubmit = (point) => {
-    // Проверяем, что презентер не уничтожен
-    if (this.#isDestroyed) {
-      return;
-    }
-
-    // Дополнительная валидация перед отправкой
-    if (!this.#isPointValid(point)) {
-      this.#pointEditComponent?.shake();
-      return;
-    }
-
-    // Для новой точки удаляем временный ID
-    const pointToSend = { ...point };
-    if (pointToSend.id && pointToSend.id.startsWith('new-')) {
-      delete pointToSend.id;
-    }
-
-    this.setSaving();
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      pointToSend,
+      point,
     );
-  };
-
-  #isPointValid(point) {
-    // Проверяем обязательные поля
-    if (!point.destination) {
-      return false;
-    }
-
-    // Проверяем цену
-    if (point.basePrice < PriceLimit.MIN || point.basePrice > PriceLimit.MAX) {
-      return false;
-    }
-
-    // Проверяем, что направление существует
-    const destination = this.#pointsModel.getDestinationsById(point.destination);
-    if (!destination) {
-      return false;
-    }
-
-    // Проверяем, что тип события валиден
-    if (!TYPE_OF_EVENTS.includes(point.type)) {
-      return false;
-    }
-
-    // Проверяем, что дата окончания позже даты начала
-    const dateFrom = new Date(point.dateFrom);
-    const dateTo = new Date(point.dateTo);
-    if (dateTo <= dateFrom) {
-      return false;
-    }
-
-    return true;
-  }
-
-  #handleCloseClick = () => {
-    this.destroy();
   };
 
   #handleDeleteClick = () => {

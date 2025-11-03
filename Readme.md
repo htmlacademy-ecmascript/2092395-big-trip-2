@@ -1,6 +1,6 @@
 # Проект «Большое путешествие»
 
-* Студент: [Василий Веркин](https://up.htmlacademy.ru/ecmascript-individual/2/user/2092395).
+* Студент: [Андрей Бернгарт](https://up.htmlacademy.ru/ecmascript-individual/2/user/826825).
 * Наставник: [Денис Лопатин](https://htmlacademy.ru/profile/denislopatin).
 
 ---
@@ -48,5 +48,5 @@ git clone SSH-адрес_вашего_форка
 
 Репозиторий создан для обучения на профессиональном курсе «[JavaScript. Архитектура клиентских приложений](https://htmlacademy.ru/intensive/ecmascript)» от [HTML Academy](https://htmlacademy.ru).
 
-[check-image]: https://github.com/htmlacademy-ecmascript/2092395-big-trip-2/workflows/Project%20check/badge.svg?branch=master
-[check-url]: https://github.com/htmlacademy-ecmascript/2092395-big-trip-2/actions
+[check-image]: https://github.com/htmlacademy-ecmascript/826825-big-trip-2/workflows/Project%20check/badge.svg?branch=master
+[check-url]: https://github.com/htmlacademy-ecmascript/826825-big-trip-2/actions

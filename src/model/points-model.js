@@ -1,45 +1,16 @@
 import Observable from '../framework/observable.js';
 import { UpdateType } from '../const.js';
+import { isDatesEqual } from '../utils/date-utils.js';
 
 export default class PointsModel extends Observable {
   #pointsApiService = null;
   #points = [];
-  #offers = [];
   #destinations = [];
-  #isLoading = true;
+  #offers = [];
 
-  constructor({ pointsApiService }) {
+  constructor({pointsApiService}) {
     super();
     this.#pointsApiService = pointsApiService;
-  }
-
-  async init() {
-    this.#isLoading = true;
-
-    try {
-      const [points, offers, destinations] = await Promise.all([
-        this.#pointsApiService.points,
-        this.#pointsApiService.offers,
-        this.#pointsApiService.destinations
-      ]);
-
-      this.#points = points.map(this.#adaptToClient);
-      this.#offers = offers;
-      this.#destinations = destinations;
-
-    } catch(err) {
-      this.#points = [];
-      this.#offers = [];
-      this.#destinations = [];
-      this._notify(UpdateType.ERROR);
-    } finally {
-      this.#isLoading = false;
-      this._notify(UpdateType.INIT);
-    }
-  }
-
-  get points() {
-    return this.#points;
   }
 
   get offers() {
@@ -50,122 +21,27 @@ export default class PointsModel extends Observable {
     return this.#destinations;
   }
 
-  get isLoading() {
-    return this.#isLoading;
+  get points() {
+    return this.#points;
   }
 
-  getOffersByType(type) {
-    if (!type) {
-      return { offers: [] };
+  async init() {
+    try {
+      const points = await this.#pointsApiService.points;
+      const offers = await this.#pointsApiService.offers;
+      const destination = await this.#pointsApiService.destinations;
+      this.#points = points.map(this.#adaptToClient);
+      this.#offers = offers;
+      this.#destinations = destination;
+
+      this._notify(UpdateType.INIT);
+    } catch(err) {
+      this.#points = [];
+      this.#destinations = [];
+      this.#offers = [];
+
+      this._notify(UpdateType.ERROR);
     }
-    return this.#offers.find((offer) => offer.type === type) || { offers: [] };
-  }
-
-  getOffersById(type, itemsId) {
-    if (!type || !itemsId || !Array.isArray(itemsId)) {
-      return [];
-    }
-
-    const offersType = this.getOffersByType(type);
-    if (!offersType || !offersType.offers) {
-      return [];
-    }
-
-    return offersType.offers.filter((item) => itemsId.includes(item.id));
-  }
-
-  getDestinationsById(id) {
-    if (!id) {
-      return null;
-    }
-    return this.#destinations.find((item) => item.id === id) || null;
-  }
-
-  getDestinationsByName(name) {
-    if (!name) {
-      return null;
-    }
-    return this.#destinations.find((item) => item.name === name) || null;
-  }
-
-  getTripTitle() {
-    const points = this.#points;
-    if (points.length === 0) {
-      return 'No points added yet';
-    }
-
-    const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
-    const destinationNames = sortedPoints
-      .map((point) => this.getDestinationsById(point.destination)?.name)
-      .filter(Boolean);
-
-    if (destinationNames.length === 0) {
-      return 'Unknown destination';
-    }
-
-    const uniqueNames = [...new Set(destinationNames)];
-
-    if (uniqueNames.length > 3) {
-      return `${uniqueNames[0]} — ... — ${uniqueNames[uniqueNames.length - 1]}`;
-    }
-    return uniqueNames.join(' — ');
-  }
-
-  getTripDateRange() {
-    const points = this.points;
-    if (points.length === 0) {
-      return '';
-    }
-
-    const sortedPoints = [...points].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
-    const startDate = sortedPoints[0].dateFrom;
-    const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
-
-    if (!startDate || !endDate) {
-      return '';
-    }
-
-    const startFormatted = this.#formatDateForHeader(startDate);
-    const endFormatted = this.#formatDateForHeader(endDate);
-
-    return `${startFormatted} — ${endFormatted}`;
-  }
-
-  #formatDateForHeader(dateString) {
-    const date = new Date(dateString);
-
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-
-    return `${day} ${month}`;
-  }
-
-  getTotalCost() {
-    const points = this.points;
-    if (points.length === 0) {
-      return 0;
-    }
-
-    return points.reduce((total, point) => {
-      const pointCost = point.basePrice || 0;
-      const offersForPoint = this.getOffersById(point.type, point.offers);
-      const offersCost = offersForPoint.reduce((sum, offer) => sum + (offer.price || 0), 0);
-      return total + pointCost + offersCost;
-    }, 0);
-  }
-
-  hasPoint(pointId) {
-    if (!pointId) {
-      return false;
-    }
-    return this.#points.some((point) => point.id === pointId);
-  }
-
-  getPointById(pointId) {
-    if (!pointId) {
-      return null;
-    }
-    return this.#points.find((point) => point.id === pointId) || null;
   }
 
   async updatePoint(updateType, update) {
@@ -179,15 +55,20 @@ export default class PointsModel extends Observable {
       const response = await this.#pointsApiService.updatePoint(update);
       const updatedPoint = this.#adaptToClient(response);
 
+      const isMinorUpdate =
+        !isDatesEqual(this.#points[index].dateFrom, updatedPoint.dateFrom) ||
+        !isDatesEqual(this.#points[index].dateTo, updatedPoint.dateTo);
+
       this.#points = [
         ...this.#points.slice(0, index),
         updatedPoint,
         ...this.#points.slice(index + 1),
       ];
 
-      this._notify(updateType, updatedPoint);
+      updateType = isMinorUpdate ? UpdateType.MINOR : updateType;
 
-    } catch (error) {
+      this._notify(updateType, updatedPoint);
+    } catch(err) {
       throw new Error('Can\'t update point');
     }
   }
@@ -196,11 +77,9 @@ export default class PointsModel extends Observable {
     try {
       const response = await this.#pointsApiService.addPoint(update);
       const newPoint = this.#adaptToClient(response);
-
       this.#points = [newPoint, ...this.#points];
       this._notify(updateType, newPoint);
-
-    } catch (error) {
+    } catch(err) {
       throw new Error('Can\'t add point');
     }
   }
@@ -214,22 +93,26 @@ export default class PointsModel extends Observable {
 
     try {
       await this.#pointsApiService.deletePoint(update);
-
-      this.#points = this.#points.filter((point) => point.id !== update.id);
+      this.#points = [
+        ...this.#points.slice(0, index),
+        ...this.#points.slice(index + 1),
+      ];
       this._notify(updateType);
-
-    } catch (error) {
+    } catch(err) {
       throw new Error('Can\'t delete point');
     }
   }
 
   #adaptToClient(point) {
-    const adaptedPoint = {
-      ...point,
+    const adaptedPoint = {...point,
+      id: point['id'],
       basePrice: point['base_price'],
-      dateFrom: point['date_from'] ? new Date(point['date_from']).toISOString() : null,
-      dateTo: point['date_to'] ? new Date(point['date_to']).toISOString() : null,
-      isFavorite: point['is_favorite']
+      dateFrom: new Date(point['date_from']),
+      dateTo: new Date(point['date_to']),
+      destination: point['destination'],
+      isFavorite: point['is_favorite'],
+      offers: point['offers'],
+      type: point['type']
     };
 
     delete adaptedPoint['base_price'];
