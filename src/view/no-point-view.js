@@ -13,6 +13,7 @@ export default class NoPointView extends AbstractView {
 
   constructor(noPointsText) {
     super();
+
     this.#noPointsText = noPointsText;
   }
 

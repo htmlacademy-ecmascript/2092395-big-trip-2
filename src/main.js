@@ -7,7 +7,7 @@ import NewPointButtonPresenter from './presenter/new-point-button-presenter.js';
 import PointsApiService from './points-api-service.js';
 
 const AUTHORIZATION = 'Basic er989jdzbVv';
-const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
+const END_POINT = 'https://23.objects.htmlacademy.pro/big-trip';
 
 class App {
   #pointsModel = null;
@@ -32,7 +32,9 @@ class App {
     try {
       await this.#pointsModel.init();
       this.#newEventButtonPresenter.init();
-    } catch (error) { /* empty */ }
+    } catch (error) {
+      document.querySelector('.trip-events__msg').textContent = error.message;
+    }
   }
 
   #initComponents() {

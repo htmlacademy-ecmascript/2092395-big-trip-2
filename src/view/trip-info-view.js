@@ -1,17 +1,3 @@
-// import AbstractView from '../framework/view/abstract-view.js';
-
-// function createTripInfoTemplate() {
-//   return (
-//     `<section class="trip-main__trip-info  trip-info">
-//     </section>`
-//   );
-// }
-
-// export default class TripInfoView extends AbstractView{
-//   get template() {
-//     return createTripInfoTemplate();
-//   }
-// }
 import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeTaskDueDate } from '../utils/date-utils.js';
 import { findOfferByType, getSelectedOffers, sortPointsByDay } from '../utils/point-utils.js';

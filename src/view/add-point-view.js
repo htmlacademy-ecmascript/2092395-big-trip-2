@@ -315,13 +315,16 @@ export default class AddPointView extends AbstractStatefulView {
 
   #offerCurrentHandler = (evt) => {
     evt.preventDefault();
+
     const target = evt.target.closest('.event__offer-label');
+
     if (!target) {
       return;
     }
 
     const currentOfferFeld = target.parentElement.querySelector('.event__offer-checkbox');
     currentOfferFeld.toggleAttribute('checked');
+
     this.updateElement({
       offers: [...evt.currentTarget.querySelectorAll('.event__offer-checkbox:checked')]
         .map((item) => item.dataset.offerId),
@@ -330,13 +333,17 @@ export default class AddPointView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
+
     const currentDestination = this.#destinations.find((destination) => destination.name.toLowerCase() === evt.target.value.toLowerCase());
+
     if (!currentDestination) {
       this.updateElement({
         destination: '',
       });
+
       return;
     }
+
     this.updateElement({
       destination: currentDestination.id,
     });
@@ -344,6 +351,7 @@ export default class AddPointView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
+
     const newPrice = parseInt(evt.target.value,10);
     this.updateElement({
       basePrice: newPrice > PointPrice.MIN_POINT_PRICE ? newPrice : PointPrice.MIN_POINT_PRICE,
@@ -357,11 +365,13 @@ export default class AddPointView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
+
     const destinationInput = this.element.querySelector('.event__input--destination');
     const destinationOptions = this.#destinations.map((destination) => destination.name);
     const priceInput = this.element.querySelector('.event__input--price');
 
     destinationInput.setCustomValidity('');
+
     if (!destinationOptions.includes(destinationInput.value.trim())) {
       destinationInput.setCustomValidity(ValidateText.DESTINATIONS_NAME_FAILED);
       destinationInput.reportValidity();
