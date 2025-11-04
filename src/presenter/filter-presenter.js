@@ -1,16 +1,16 @@
 import { render, replace, remove } from '../framework/render.js';
-import FilterView from '../view/filter-view.js';
-import { isPointFuture, isPointPresent, isPointPast } from '../utils/point.js';
+import FilterView from '../view/filters-view.js';
+import { filter } from '../utils/filter.js';
 import { FilterType, UpdateType } from '../const.js';
+
 
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #pointsModel = null;
-
   #filterComponent = null;
 
-  constructor({ filterContainer, filterModel, pointsModel }) {
+  constructor({filterContainer, filterModel, pointsModel}) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
@@ -19,18 +19,17 @@ export default class FilterPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init(container = this.#filterContainer) {
-    if (container) {
-      this.#filterContainer = container;
-    }
+  get filters() {
+    const points = this.#pointsModel.points;
+    return Object.values(FilterType).map((type) => ({
+      type,
+      count: filter[type](points).length
+    }));
+  }
 
-    if (this.#pointsModel.isLoading) {
-      return;
-    }
-
+  init() {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
-
     this.#filterComponent = new FilterView({
       filters,
       currentFilterType: this.#filterModel.filter,
@@ -46,45 +45,8 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   }
 
-  get filters() {
-    const points = this.#pointsModel.points;
-
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'Everything',
-        count: points.length,
-        isDisabled: points.length === 0,
-        isChecked: this.#filterModel.filter === FilterType.EVERYTHING
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'Future',
-        count: points.filter((point) => isPointFuture(point)).length,
-        isDisabled: points.filter((point) => isPointFuture(point)).length === 0,
-        isChecked: this.#filterModel.filter === FilterType.FUTURE
-      },
-      {
-        type: FilterType.PRESENT,
-        name: 'Present',
-        count: points.filter((point) => isPointPresent(point)).length,
-        isDisabled: points.filter((point) => isPointPresent(point)).length === 0,
-        isChecked: this.#filterModel.filter === FilterType.PRESENT
-      },
-      {
-        type: FilterType.PAST,
-        name: 'Past',
-        count: points.filter((point) => isPointPast(point)).length,
-        isDisabled: points.filter((point) => isPointPast(point)).length === 0,
-        isChecked: this.#filterModel.filter === FilterType.PAST
-      }
-    ];
-  }
-
-  #handleModelEvent = (updateType) => {
-    if (updateType === 'INIT') {
-      this.init();
-    }
+  #handleModelEvent = () => {
+    this.init();
   };
 
   #handleFilterTypeChange = (filterType) => {
@@ -92,6 +54,6 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filterModel.setFilter(UpdateType.MINOR, filterType);
   };
 }

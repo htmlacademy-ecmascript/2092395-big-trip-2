@@ -1,4 +1,5 @@
 import ApiService from './framework/api-service.js';
+import { Url } from './const.js';
 
 const Method = {
   GET: 'GET',
@@ -9,23 +10,23 @@ const Method = {
 
 export default class PointsApiService extends ApiService {
   get points() {
-    return this._load({url: 'points'})
+    return this._load({url: Url.POINTS})
       .then(ApiService.parseResponse);
   }
 
   get offers() {
-    return this._load({url: 'offers'})
+    return this._load({url: Url.OFFERS})
       .then(ApiService.parseResponse);
   }
 
   get destinations() {
-    return this._load({url: 'destinations'})
+    return this._load({url: Url.DESTINATIONS})
       .then(ApiService.parseResponse);
   }
 
   async updatePoint(point) {
     const response = await this._load({
-      url: `points/${point.id}`,
+      url: `${Url.POINTS}/${point.id}`,
       method: Method.PUT,
       body: JSON.stringify(this.#adaptToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -36,7 +37,7 @@ export default class PointsApiService extends ApiService {
 
   async addPoint(point) {
     const response = await this._load({
-      url: 'points',
+      url: Url.POINTS,
       method: Method.POST,
       body: JSON.stringify(this.#adaptToServer(point)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -46,31 +47,28 @@ export default class PointsApiService extends ApiService {
   }
 
   async deletePoint(point) {
-    const response = await this._load({
-      url: `points/${point.id}`,
+    return this._load({
+      url: `${Url.POINTS}/${point.id}`,
       method: Method.DELETE,
     });
-
-    return response;
   }
 
   #adaptToServer(point) {
-    const adaptedPoint = {
-      'base_price': Number(point.basePrice),
-      'date_from': new Date(point.dateFrom).toISOString(),
-      'date_to': new Date(point.dateTo).toISOString(),
-      'destination': point.destination,
+    const adaptedPoint = {...point,
       'id': point.id,
-      'is_favorite': Boolean(point.isFavorite),
-      'offers': point.offers || [],
+      'base_price': point.basePrice,
+      'date_from': point.dateFrom.toISOString(),
+      'date_to': point.dateTo.toISOString(),
+      'destination': point.destination,
+      'is_favorite': point.isFavorite,
+      'offers': point.offers,
       'type': point.type
     };
 
-    // Удаляем временный ID для новых точек
-    if (point.id && point.id.startsWith('new-')) {
-      delete adaptedPoint.id;
-    }
-
+    delete adaptedPoint.basePrice;
+    delete adaptedPoint.dateFrom;
+    delete adaptedPoint.dateTo;
+    delete adaptedPoint.isFavorite;
     return adaptedPoint;
   }
 }

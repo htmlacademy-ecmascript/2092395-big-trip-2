@@ -1,46 +1,40 @@
-import { render, RenderPosition, remove } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
+import { render, replace, remove, RenderPosition } from '../framework/render.js';
 
 export default class TripInfoPresenter {
-  #container = null;
+  #infoContainer = null;
   #pointsModel = null;
-  #tripInfoComponent = null;
+  #infoComponent = null;
 
-  constructor({ container, pointsModel }) {
-    this.#container = container;
+  constructor({infoContainer, pointsModel}) {
+    this.#infoContainer = infoContainer;
     this.#pointsModel = pointsModel;
+    this.#pointsModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
-    this.#renderTripInfo();
-  }
+    const points = [...this.#pointsModel.points];
+    const destinations = this.#pointsModel.destinations;
+    const offers = this.#pointsModel.offers;
 
-  /**
-   * Обновляет информацию о поездке
-   */
-  update() {
-    this.#renderTripInfo();
-  }
+    const prevInfoComponent = this.#infoComponent;
 
-  #renderTripInfo() {
-    // Удаляем предыдущий компонент, если он есть
-    if (this.#tripInfoComponent) {
-      remove(this.#tripInfoComponent);
-    }
-
-    // Используем методы модели для получения данных
-    const tripTitle = this.#pointsModel.getTripTitle();
-    const tripDateRange = this.#pointsModel.getTripDateRange();
-    const totalCost = this.#pointsModel.getTotalCost();
-
-    // Создаем экземпляр View, передавая в него данные
-    this.#tripInfoComponent = new TripInfoView({
-      tripTitle,
-      tripDateRange,
-      totalCost
+    this.#infoComponent = new TripInfoView({
+      points,
+      destinations,
+      offers
     });
 
-    // Рендерим компонент в переданный контейнер
-    render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
+    if (prevInfoComponent === null) {
+      render(this.#infoComponent, this.#infoContainer, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    replace(this.#infoComponent, prevInfoComponent);
+    remove(prevInfoComponent);
   }
+
+  #handleModelEvent = () => {
+    this.init();
+  };
 }
